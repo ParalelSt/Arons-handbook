@@ -4,7 +4,7 @@ import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Input } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { workoutApi, setApi } from "@/lib/api";
-import type { WorkoutWithExercises, Set } from "@/types";
+import type { WorkoutWithExercises } from "@/types";
 import { format, parseISO } from "date-fns";
 import { Plus, Trash2, Edit2, Save, X } from "lucide-react";
 
@@ -15,7 +15,9 @@ export function WorkoutDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
-  const [editedSets, setEditedSets] = useState<Record<string, { reps: number; weight: number }>>({});
+  const [editedSets, setEditedSets] = useState<
+    Record<string, { reps: number; weight: number }>
+  >({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function WorkoutDetailScreen() {
 
   function startEditing() {
     if (!workout) return;
-    
+
     // Initialize editedSets with current values
     const sets: Record<string, { reps: number; weight: number }> = {};
     workout.workout_exercises.forEach((we) => {
@@ -80,15 +82,15 @@ export function WorkoutDetailScreen() {
       const updates = Object.entries(editedSets).map(([setId, values]) =>
         setApi.update(setId, values)
       );
-      
+
       await Promise.all(updates);
-      
+
       // Reload workout to show updated values
       if (workoutId) {
         const data = await workoutApi.getById(workoutId);
         setWorkout(data);
       }
-      
+
       setIsEditing(false);
       setEditedSets({});
     } catch (err: any) {
@@ -99,8 +101,13 @@ export function WorkoutDetailScreen() {
     }
   }
 
-  function updateEditedSet(setId: string, field: 'reps' | 'weight', value: string) {
-    const numValue = field === 'reps' ? parseInt(value) || 0 : parseFloat(value) || 0;
+  function updateEditedSet(
+    setId: string,
+    field: "reps" | "weight",
+    value: string
+  ) {
+    const numValue =
+      field === "reps" ? parseInt(value) || 0 : parseFloat(value) || 0;
     setEditedSets((prev) => ({
       ...prev,
       [setId]: {
@@ -146,7 +153,11 @@ export function WorkoutDetailScreen() {
           <div className="flex gap-2">
             {isEditing ? (
               <>
-                <Button variant="secondary" onClick={cancelEditing} disabled={saving}>
+                <Button
+                  variant="secondary"
+                  onClick={cancelEditing}
+                  disabled={saving}
+                >
                   <X className="w-4 h-4" />
                 </Button>
                 <Button onClick={saveEdits} disabled={saving}>
@@ -230,7 +241,9 @@ export function WorkoutDetailScreen() {
                                 label=""
                                 type="number"
                                 value={editedSets[set.id]?.reps ?? set.reps}
-                                onChange={(v) => updateEditedSet(set.id, 'reps', v)}
+                                onChange={(v) =>
+                                  updateEditedSet(set.id, "reps", v)
+                                }
                                 placeholder="Reps"
                                 min={0}
                               />
@@ -239,7 +252,9 @@ export function WorkoutDetailScreen() {
                                 label=""
                                 type="number"
                                 value={editedSets[set.id]?.weight ?? set.weight}
-                                onChange={(v) => updateEditedSet(set.id, 'weight', v)}
+                                onChange={(v) =>
+                                  updateEditedSet(set.id, "weight", v)
+                                }
                                 placeholder="kg"
                                 min={0}
                                 step={0.5}
