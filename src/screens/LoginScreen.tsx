@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Button } from "@/components/ui/Layout";
 import { Input } from "@/components/ui/Form";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { auth } from "@/lib/auth";
 
 export function LoginScreen() {
@@ -35,6 +36,8 @@ export function LoginScreen() {
   return (
     <Container className="flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-md">
+        <Breadcrumbs items={[{ label: "Login" }]} />
+
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             Gym LogBook

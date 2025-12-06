@@ -37,7 +37,7 @@ export function Input({
         min={min}
         step={step}
         className={cn(
-          "px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base",
+          "w-full min-w-0 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base",
           "bg-slate-900/50 border border-slate-700",
           "text-white placeholder-slate-500",
           "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",

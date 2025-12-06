@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Input } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { exerciseApi, goalApi } from "@/lib/api";
@@ -137,6 +138,12 @@ export function GoalsScreen() {
             </Button>
           ) : null
         }
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onClick: () => navigate("/") },
+          { label: "Goals" },
+        ]}
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">

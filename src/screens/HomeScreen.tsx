@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { workoutApi } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import type { WeekWorkouts } from "@/types";
@@ -91,6 +92,12 @@ export function HomeScreen() {
             </Button>
           </div>
         }
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home" },
+        ]}
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">

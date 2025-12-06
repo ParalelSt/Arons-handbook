@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Input, TextArea, Modal } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { templateApi } from "@/lib/templates";
@@ -198,6 +199,13 @@ export function AddEditTemplateScreen() {
       <Header
         title={isEditing ? "Edit Template" : "New Template"}
         onBack={() => navigate("/templates")}
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onClick: () => navigate("/") },
+          { label: "Templates", onClick: () => navigate("/templates") },
+          { label: isEditing ? "Edit" : "New" },
+        ]}
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Input, TextArea, Modal } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { workoutApi, exerciseApi } from "@/lib/api";
@@ -171,6 +172,12 @@ export function AddWorkoutScreen() {
   return (
     <Container>
       <Header title="New Workout" onBack={() => navigate(-1)} />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onClick: () => navigate("/") },
+          { label: "New Workout" },
+        ]}
+      />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {error && (

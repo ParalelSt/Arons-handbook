@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { workoutApi } from "@/lib/api";
 import type { WorkoutWithExercises } from "@/types";
 import {
@@ -81,6 +82,12 @@ export function WeekDetailScreen() {
             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         }
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onClick: () => navigate("/") },
+          { label: "Week", onClick: () => navigate(`/week/${weekStart}`) },
+        ]}
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
