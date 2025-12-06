@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Input, Modal } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { exerciseApi } from "@/lib/api";

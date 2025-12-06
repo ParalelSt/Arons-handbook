@@ -6,7 +6,11 @@ import { Input, TextArea, Modal } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { workoutApi, exerciseApi } from "@/lib/api";
 import { templateApi } from "@/lib/templates";
-import type { Exercise, CreateWorkoutExerciseInput, WorkoutTemplateWithExercises } from "@/types";
+import type {
+  Exercise,
+  CreateWorkoutExerciseInput,
+  WorkoutTemplateWithExercises,
+} from "@/types";
 import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
 
@@ -28,7 +32,9 @@ export function AddWorkoutScreen() {
 
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
-  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>([]);
+  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>(
+    []
+  );
 
   // Load draft on mount
   useEffect(() => {

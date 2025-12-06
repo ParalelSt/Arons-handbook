@@ -190,7 +190,9 @@ export function GoalsScreen() {
                     <Input
                       label="Target Weight (kg)"
                       type="number"
-                      value={goal?.target_weight ? String(goal.target_weight) : ""}
+                      value={
+                        goal?.target_weight ? String(goal.target_weight) : ""
+                      }
                       onChange={(v) => updateGoal(exercise.id, "weight", v)}
                       placeholder="e.g., 50"
                       min={0}

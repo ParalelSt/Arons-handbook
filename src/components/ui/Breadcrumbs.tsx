@@ -41,9 +41,9 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                 {item.label}
               </button>
             ) : (
-              <span className={cn(isLast && "font-semibold text-white")}>{
-                item.label
-              }</span>
+              <span className={cn(isLast && "font-semibold text-white")}>
+                {item.label}
+              </span>
             )}
             {!isLast && <span className="text-slate-500">/</span>}
           </span>

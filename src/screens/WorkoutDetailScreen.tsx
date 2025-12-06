@@ -247,7 +247,9 @@ export function WorkoutDetailScreen() {
                               <Input
                                 label=""
                                 type="number"
-                                value={String(editedSets[set.id]?.reps ?? set.reps)}
+                                value={String(
+                                  editedSets[set.id]?.reps ?? set.reps
+                                )}
                                 onChange={(v) =>
                                   updateEditedSet(set.id, "reps", v)
                                 }
@@ -258,7 +260,9 @@ export function WorkoutDetailScreen() {
                               <Input
                                 label=""
                                 type="number"
-                                value={String(editedSets[set.id]?.weight ?? set.weight)}
+                                value={String(
+                                  editedSets[set.id]?.weight ?? set.weight
+                                )}
                                 onChange={(v) =>
                                   updateEditedSet(set.id, "weight", v)
                                 }
