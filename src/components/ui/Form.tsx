@@ -96,12 +96,12 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-slate-800 rounded-t-2xl sm:rounded-2xl border-t sm:border border-slate-700 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-slate-800 rounded-t-2xl sm:rounded-2xl border-t sm:border border-slate-700 max-w-lg w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto mx-0 sm:mx-auto">
         <div className="sticky top-0 bg-slate-800 border-b border-slate-700 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <h2 className="text-lg sm:text-xl font-bold text-white">{title}</h2>
           <button
@@ -123,7 +123,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             </svg>
           </button>
         </div>
-        <div className="p-4 sm:p-6 pb-safe">{children}</div>
+        <div className="p-4 sm:p-6 pb-6 sm:pb-6">{children}</div>
       </div>
     </div>
   );
