@@ -7,6 +7,8 @@ import { exerciseApi } from "@/lib/api";
 import type { Exercise, CreateTemplateExerciseInput } from "@/types";
 import { Plus, X } from "lucide-react";
 
+const DRAFT_KEY = 'template-draft';
+
 export function AddEditTemplateScreen() {
   const navigate = useNavigate();
   const { templateId } = useParams<{ templateId: string }>();
@@ -21,12 +23,34 @@ export function AddEditTemplateScreen() {
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
 
+  // Load draft on mount
   useEffect(() => {
     loadExercises();
     if (isEditing) {
       loadTemplate();
+    } else {
+      // Load draft only for new templates
+      const draft = localStorage.getItem(DRAFT_KEY);
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft);
+          setName(parsed.name || "");
+          setDescription(parsed.description || "");
+          setExercises(parsed.exercises || []);
+        } catch (err) {
+          console.error("Failed to load draft:", err);
+        }
+      }
     }
   }, []);
+
+  // Auto-save draft whenever data changes (only for new templates)
+  useEffect(() => {
+    if (!isEditing && (name || description || exercises.length > 0)) {
+      const draft = { name, description, exercises };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }
+  }, [name, description, exercises, isEditing]);
 
   async function loadExercises() {
     try {
@@ -115,6 +139,8 @@ export function AddEditTemplateScreen() {
           description: description || undefined,
           exercises,
         });
+        // Clear draft after successful save
+        localStorage.removeItem(DRAFT_KEY);
       }
       navigate("/templates");
     } catch (err) {
@@ -283,6 +309,12 @@ export function AddEditTemplateScreen() {
                 : "Create Template"}
             </Button>
           </div>
+
+          {!isEditing && (name || description || exercises.length > 0) && (
+            <p className="text-xs text-slate-500 text-center">
+              Draft saved automatically
+            </p>
+          )}
         </form>
       </div>
 

@@ -7,6 +7,8 @@ import type { Exercise, CreateWorkoutExerciseInput } from "@/types";
 import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
 
+const DRAFT_KEY = 'workout-draft';
+
 export function AddWorkoutScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -23,9 +25,30 @@ export function AddWorkoutScreen() {
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
 
+  // Load draft on mount
   useEffect(() => {
     loadExercises();
+    const draft = localStorage.getItem(DRAFT_KEY);
+    if (draft && !presetDate) {
+      try {
+        const parsed = JSON.parse(draft);
+        setDate(parsed.date || format(new Date(), "yyyy-MM-dd"));
+        setTitle(parsed.title || "");
+        setNotes(parsed.notes || "");
+        setExercises(parsed.exercises || []);
+      } catch (err) {
+        console.error("Failed to load draft:", err);
+      }
+    }
   }, []);
+
+  // Auto-save draft whenever data changes
+  useEffect(() => {
+    if (title || notes || exercises.length > 0) {
+      const draft = { date, title, notes, exercises };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }
+  }, [date, title, notes, exercises]);
 
   async function loadExercises() {
     try {
@@ -98,6 +121,8 @@ export function AddWorkoutScreen() {
         notes: notes || undefined,
         exercises,
       });
+      // Clear draft after successful save
+      localStorage.removeItem(DRAFT_KEY);
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -267,6 +292,12 @@ export function AddWorkoutScreen() {
               {saving ? "Saving..." : "Save Workout"}
             </Button>
           </div>
+
+          {(title || notes || exercises.length > 0) && (
+            <p className="text-xs text-slate-500 text-center">
+              Draft saved automatically
+            </p>
+          )}
         </form>
       </div>
 

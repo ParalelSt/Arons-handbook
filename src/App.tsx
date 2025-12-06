@@ -16,7 +16,8 @@ function App() {
 
   useEffect(() => {
     // Check for existing session first
-    auth.getCurrentUser()
+    auth
+      .getCurrentUser()
       .then((currentUser) => {
         setUser(currentUser);
         setLoading(false);
