@@ -35,7 +35,8 @@ export function Header({ title, onBack, action }: HeaderProps) {
   return (
     <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-10">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <ThemeSelector />
           {onBack && (
             <button
               onClick={onBack}
@@ -61,10 +62,7 @@ export function Header({ title, onBack, action }: HeaderProps) {
             {title}
           </h1>
         </div>
-        <div className="flex items-center gap-2">
-          {action && <div className="flex-shrink-0">{action}</div>}
-          <ThemeSelector />
-        </div>
+        {action && <div className="flex-shrink-0">{action}</div>}
       </div>
     </header>
   );
@@ -77,12 +75,15 @@ interface CardProps {
 }
 
 export function Card({ children, className, onClick }: CardProps) {
+  const { currentTheme } = useTheme();
+  const theme = getTheme(currentTheme);
+
   return (
     <div
       className={cn(
-        "bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700",
-        "hover:border-slate-600 transition-all duration-200",
-        onClick && "cursor-pointer hover:bg-slate-800/70",
+        `${theme.colors.bg.card} backdrop-blur-sm rounded-xl border ${theme.colors.border.primary}`,
+        `${theme.colors.border.light} transition-all duration-200`,
+        onClick && `cursor-pointer ${theme.colors.bg.cardHover}`,
         className
       )}
       onClick={onClick}
