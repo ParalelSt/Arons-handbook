@@ -3,6 +3,7 @@ import type {
   WorkoutTemplate,
   WorkoutTemplateWithExercises,
   CreateTemplateInput,
+  CreateTemplateExerciseInput,
   CreateWorkoutInput,
 } from "@/types";
 
@@ -124,6 +125,64 @@ export const templateApi = {
       .eq("id", id);
 
     if (error) throw error;
+    return this.getById(id);
+  },
+
+  // Update template with exercises
+  async updateWithExercises(
+    id: string,
+    input: Partial<WorkoutTemplate> & { exercises?: CreateTemplateExerciseInput[] }
+  ): Promise<WorkoutTemplateWithExercises> {
+    // Update template metadata
+    const { error: metaError } = await supabase
+      .from("workout_templates")
+      .update({
+        name: input.name,
+        description: input.description,
+      })
+      .eq("id", id);
+
+    if (metaError) throw metaError;
+
+    // If exercises provided, delete old ones and recreate
+    if (input.exercises) {
+      const { data: oldExercises, error: fetchError } = await supabase
+        .from("template_exercises")
+        .select("id")
+        .eq("template_id", id);
+
+      if (fetchError) throw fetchError;
+
+      // Delete all old exercises
+      for (const te of oldExercises || []) {
+        const { error: delError } = await supabase
+          .from("template_exercises")
+          .delete()
+          .eq("id", te.id);
+        if (delError) throw delError;
+      }
+
+      // Insert new exercises
+      for (let i = 0; i < input.exercises.length; i++) {
+        const ex = input.exercises[i];
+        const { error: exError } = await supabase
+          .from("template_exercises")
+          .insert([
+            {
+              template_id: id,
+              exercise_id: ex.exercise_id,
+              target_sets: ex.target_sets,
+              target_reps: ex.target_reps,
+              target_weight: ex.target_weight,
+              notes: ex.notes,
+              order_index: i,
+            },
+          ]);
+
+        if (exError) throw exError;
+      }
+    }
+
     return this.getById(id);
   },
 

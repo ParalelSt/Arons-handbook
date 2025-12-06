@@ -147,15 +147,12 @@ export function AddEditTemplateScreen() {
       setSaving(true);
       setError("");
       if (isEditing && templateId) {
-        // Delete and recreate template exercises for simplicity
-        await templateApi.update(templateId, {
+        // Update template metadata and exercises
+        await templateApi.updateWithExercises(templateId, {
           name,
           description: description || undefined,
+          exercises,
         });
-        // Note: In production, you'd want more sophisticated update logic
-        setError(
-          "Template updated! (Note: Exercise updates require deleting and recreating)"
-        );
       } else {
         await templateApi.create({
           name,
@@ -334,7 +331,8 @@ export function AddEditTemplateScreen() {
                         }
                         onChange={(v) =>
                           updateExercise(index, {
-                            target_reps: v === "" ? undefined : parseInt(v) || 0,
+                            target_reps:
+                              v === "" ? undefined : parseInt(v) || 0,
                           })
                         }
                         min={1}
@@ -350,7 +348,11 @@ export function AddEditTemplateScreen() {
                         onChange={(v) =>
                           updateExercise(index, {
                             target_weight:
-                              v === "" ? undefined : Number.isNaN(parseFloat(v)) ? undefined : parseFloat(v),
+                              v === ""
+                                ? undefined
+                                : Number.isNaN(parseFloat(v))
+                                ? undefined
+                                : parseFloat(v),
                           })
                         }
                         min={0}
