@@ -176,7 +176,7 @@ export const templateApi = {
         sets: Array(te.target_sets)
           .fill({})
           .map(() => ({
-            reps: te.target_reps || 0,
+            reps: te.target_reps || 10,  // Default to 10 reps instead of 0
             weight: te.target_weight || 0,
           })),
         notes: te.notes || undefined,
