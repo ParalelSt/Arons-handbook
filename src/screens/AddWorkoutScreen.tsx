@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Input, TextArea, Modal } from "@/components/ui/Form";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { workoutApi, exerciseApi } from "@/lib/api";
 import type { Exercise, CreateWorkoutExerciseInput } from "@/types";
 import { format } from "date-fns";
