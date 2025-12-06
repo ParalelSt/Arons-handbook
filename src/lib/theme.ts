@@ -55,7 +55,8 @@ export const themes = {
       },
       button: {
         primary: "bg-red-600 hover:bg-red-700 text-white",
-        secondary: "bg-red-900/40 hover:bg-red-800/60 text-white border border-red-700/50",
+        secondary:
+          "bg-red-900/40 hover:bg-red-800/60 text-white border border-red-700/50",
         accent:
           "bg-red-600/20 border border-red-500/50 hover:bg-red-600/30 hover:border-red-500",
       },
