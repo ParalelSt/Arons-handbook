@@ -168,9 +168,32 @@ export const templateApi = {
     const template = await this.getById(templateId);
     console.log("Template data:", template); // Debug log
 
+    // Import workoutApi to check for existing workouts
+    const { workoutApi } = await import("./api");
+    
+    // Check if a workout with the same title already exists on this date
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const workoutTitle = title || template.name;
+    const { data: existingWorkouts, error: checkError } = await supabase
+      .from("workouts")
+      .select("id, title")
+      .eq("user_id", user.id)
+      .eq("date", date)
+      .eq("title", workoutTitle);
+
+    if (checkError) throw checkError;
+
+    if (existingWorkouts && existingWorkouts.length > 0) {
+      throw new Error(`A workout named "${workoutTitle}" already exists on ${date}. Please delete it first or choose a different date.`);
+    }
+
     const workoutInput: CreateWorkoutInput = {
       date,
-      title: title || template.name,
+      title: workoutTitle,
       notes: template.description || undefined,
       exercises: template.template_exercises.map((te) => ({
         exercise_id: te.exercise_id,
@@ -186,8 +209,6 @@ export const templateApi = {
 
     console.log("Creating workout with input:", workoutInput); // Debug log
 
-    // Import workoutApi locally to avoid circular dependency
-    const { workoutApi } = await import("./api");
     const workout = await workoutApi.create(workoutInput);
     console.log("Created workout:", workout); // Debug log
     return workout.id;
