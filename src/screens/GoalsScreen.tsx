@@ -16,6 +16,8 @@ export function GoalsScreen() {
   const [error, setError] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [edited, setEdited] = useState<Set<string>>(new Set());
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadData();
@@ -159,49 +161,64 @@ export function GoalsScreen() {
             </Button>
           </Card>
         ) : (
-          <div className="space-y-3 sm:space-y-4">
-            {exercises.map((exercise) => {
-              const goal = goals[exercise.id];
-              return (
-                <Card key={exercise.id} className="p-4 sm:p-5">
-                  <div className="flex items-start justify-between mb-4 gap-2">
-                    <h3 className="text-base sm:text-lg font-semibold text-white truncate">
-                      {exercise.name}
-                    </h3>
-                    {goal && (
-                      <button
-                        onClick={() => deleteGoal(exercise.id)}
-                        className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4 text-slate-400" />
-                      </button>
-                    )}
-                  </div>
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h2 className="text-lg font-semibold text-white">Your Goals</h2>
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={() => setShowAddModal(true)}>
+                  + Add Goal
+                </Button>
+              </div>
+            </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Input
-                      label="Target Reps"
-                      type="number"
-                      value={goal?.target_reps ? String(goal.target_reps) : ""}
-                      onChange={(v) => updateGoal(exercise.id, "reps", v)}
-                      placeholder="e.g., 12"
-                      min={0}
-                    />
-                    <Input
-                      label="Target Weight (kg)"
-                      type="number"
-                      value={
-                        goal?.target_weight ? String(goal.target_weight) : ""
-                      }
-                      onChange={(v) => updateGoal(exercise.id, "weight", v)}
-                      placeholder="e.g., 50"
-                      min={0}
-                      step={0.5}
-                    />
-                  </div>
-                </Card>
-              );
-            })}
+            {Object.keys(goals).length === 0 ? (
+              <Card className="p-6 text-center">
+                <p className="text-slate-400 mb-3">No goals yet.</p>
+                <Button onClick={() => setShowAddModal(true)}>Add Your First Goal</Button>
+              </Card>
+            ) : (
+              <div className="space-y-3 sm:space-y-4">
+                {Object.keys(goals)
+                  .map((id) => ({ id, exercise: exercises.find((e) => e.id === id), goal: goals[id] }))
+                  .filter((item) => item.exercise)
+                  .sort((a, b) => a.exercise!.name.localeCompare(b.exercise!.name))
+                  .map(({ id, exercise, goal }) => (
+                    <Card key={id} className="p-4 sm:p-5">
+                      <div className="flex items-start justify-between mb-4 gap-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-white truncate">
+                          {exercise?.name}
+                        </h3>
+                        <button
+                          onClick={() => deleteGoal(id)}
+                          className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4 text-slate-400" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Input
+                          label="Target Reps"
+                          type="number"
+                          value={goal?.target_reps ? String(goal.target_reps) : ""}
+                          onChange={(v) => updateGoal(id, "reps", v)}
+                          placeholder="e.g., 12"
+                          min={0}
+                        />
+                        <Input
+                          label="Target Weight (kg)"
+                          type="number"
+                          value={goal?.target_weight ? String(goal.target_weight) : ""}
+                          onChange={(v) => updateGoal(id, "weight", v)}
+                          placeholder="e.g., 50"
+                          min={0}
+                          step={0.5}
+                        />
+                      </div>
+                    </Card>
+                  ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -223,6 +240,66 @@ export function GoalsScreen() {
           </div>
         )}
       </div>
+
+      {/* Add Goal Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowAddModal(false)}
+          />
+          <div className="relative bg-slate-800 rounded-2xl border border-slate-700 max-w-lg w-[95%] sm:w-full max-h-[80vh] overflow-y-auto mx-auto my-auto p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Add Goal</h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <span className="text-slate-400">✕</span>
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs sm:text-sm font-medium text-slate-300">Search exercises</label>
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Type to search"
+                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {exercises
+                  .filter((ex) => !goals[ex.id])
+                  .filter((ex) => ex.name.toLowerCase().includes(search.toLowerCase()))
+                  .map((exercise) => (
+                    <button
+                      key={exercise.id}
+                      onClick={() => {
+                        setGoals((prev) => ({
+                          ...prev,
+                          [exercise.id]: { exercise_id: exercise.id },
+                        }));
+                        setEdited((prev) => new Set([...prev, exercise.id]));
+                        setShowAddModal(false);
+                        setSearch("");
+                      }}
+                      className="w-full text-left p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-700 hover:border-slate-600 transition-all"
+                    >
+                      <p className="text-white font-medium">{exercise.name}</p>
+                    </button>
+                  ))}
+
+                {exercises.filter((ex) => !goals[ex.id]).filter((ex) => ex.name.toLowerCase().includes(search.toLowerCase())).length === 0 && (
+                  <p className="text-slate-500 text-sm text-center py-6">No exercises available.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Container>
   );
 }
