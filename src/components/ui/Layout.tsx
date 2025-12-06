@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
+import { getTheme } from "@/lib/theme";
+import { ThemeSelector } from "./ThemeSelector";
 
 interface ContainerProps {
   children: ReactNode;
@@ -7,10 +10,13 @@ interface ContainerProps {
 }
 
 export function Container({ children, className }: ContainerProps) {
+  const { currentTheme } = useTheme();
+  const theme = getTheme(currentTheme);
+  
   return (
     <div
       className={cn(
-        "min-h-screen bg-gradient-to-br from-slate-900 to-slate-800",
+        `min-h-screen bg-gradient-to-br ${theme.colors.bg.gradient}`,
         className
       )}
     >
@@ -55,7 +61,10 @@ export function Header({ title, onBack, action }: HeaderProps) {
             {title}
           </h1>
         </div>
-        {action && <div className="flex-shrink-0">{action}</div>}
+        <div className="flex items-center gap-2">
+          {action && <div className="flex-shrink-0">{action}</div>}
+          <ThemeSelector />
+        </div>
       </div>
     </header>
   );
@@ -100,9 +109,12 @@ export function Button({
   type = "button",
   disabled = false,
 }: ButtonProps) {
+  const { currentTheme } = useTheme();
+  const theme = getTheme(currentTheme);
+  
   const variants = {
-    primary: "bg-blue-600 hover:bg-blue-700 text-white",
-    secondary: "bg-slate-700 hover:bg-slate-600 text-white",
+    primary: theme.colors.button.primary,
+    secondary: theme.colors.button.secondary,
     danger: "bg-red-600 hover:bg-red-700 text-white",
   };
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "@/lib/auth";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { PWAPrompt } from "@/components/ui/PWAPrompt";
 import { LoginScreen } from "@/screens/LoginScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
@@ -47,51 +48,53 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <PWAPrompt />
-      <Routes>
-        <Route
-          path="/login"
-          element={!user ? <LoginScreen /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/"
-          element={user ? <HomeScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/week/:weekStart"
-          element={user ? <WeekDetailScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/workout/new"
-          element={user ? <AddWorkoutScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/workout/:workoutId"
-          element={user ? <WorkoutDetailScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/exercises"
-          element={user ? <ExercisesScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/templates"
-          element={user ? <TemplatesScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/templates/new"
-          element={user ? <AddEditTemplateScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/templates/:templateId/edit"
-          element={user ? <AddEditTemplateScreen /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/goals"
-          element={user ? <GoalsScreen /> : <Navigate to="/login" />}
-        />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <PWAPrompt />
+        <Routes>
+          <Route
+            path="/login"
+            element={!user ? <LoginScreen /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/"
+            element={user ? <HomeScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/week/:weekStart"
+            element={user ? <WeekDetailScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/workout/new"
+            element={user ? <AddWorkoutScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/workout/:workoutId"
+            element={user ? <WorkoutDetailScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/exercises"
+            element={user ? <ExercisesScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/templates"
+            element={user ? <TemplatesScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/templates/new"
+            element={user ? <AddEditTemplateScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/templates/:templateId/edit"
+            element={user ? <AddEditTemplateScreen /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/goals"
+            element={user ? <GoalsScreen /> : <Navigate to="/login" />}
+          />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
