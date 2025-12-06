@@ -21,7 +21,7 @@ export function ThemeSelector() {
       </button>
 
       {showMenu && (
-        <div className="absolute left-0 top-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-3 min-w-[180px] z-50">
+        <div className="absolute right-0 top-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-3 min-w-[180px] z-50">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-white">Theme</h3>
             <button
@@ -39,16 +39,16 @@ export function ThemeSelector() {
                 themeKey === "blue"
                   ? "#2563eb"
                   : themeKey === "red"
-                    ? "#dc2626"
-                    : "#64748b";
+                  ? "#dc2626"
+                  : "#64748b";
 
               const buttonClass =
                 isActive &&
                 (themeKey === "blue"
                   ? " bg-blue-600"
                   : themeKey === "red"
-                    ? " bg-red-600"
-                    : " bg-slate-600");
+                  ? " bg-red-600"
+                  : " bg-slate-600");
 
               return (
                 <button
