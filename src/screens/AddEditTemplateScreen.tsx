@@ -24,6 +24,7 @@ export function AddEditTemplateScreen() {
 
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
+  const [hasDraft, setHasDraft] = useState(false);
 
   // Load draft on mount
   useEffect(() => {
@@ -119,7 +120,6 @@ export function AddEditTemplateScreen() {
         setName(parsed.name || "");
         setDescription(parsed.description || "");
         setExercises(parsed.exercises || []);
-        setDraftLoaded(true);
         setHasDraft(false);
       } catch (err) {
         console.error("Failed to load draft:", err);
@@ -130,7 +130,6 @@ export function AddEditTemplateScreen() {
   function clearDraft() {
     localStorage.removeItem(DRAFT_KEY);
     setHasDraft(false);
-    setDraftLoaded(false);
     setName("");
     setDescription("");
     setExercises([]);
