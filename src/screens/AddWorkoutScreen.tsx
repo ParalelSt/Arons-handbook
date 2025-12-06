@@ -317,7 +317,7 @@ export function AddWorkoutScreen() {
         {availableExercises.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-slate-400 mb-4">No exercises available</p>
-            <Button onClick={() => navigate("/exercises/new")}>
+            <Button onClick={() => navigate("/exercises")}>
               Create Your First Exercise
             </Button>
           </div>

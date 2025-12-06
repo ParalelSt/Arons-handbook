@@ -170,7 +170,7 @@ export const templateApi = {
 
     // Import workoutApi to check for existing workouts
     const { workoutApi } = await import("./api");
-    
+
     // Check if a workout with the same title already exists on this date
     const {
       data: { user },
@@ -188,7 +188,9 @@ export const templateApi = {
     if (checkError) throw checkError;
 
     if (existingWorkouts && existingWorkouts.length > 0) {
-      throw new Error(`A workout named "${workoutTitle}" already exists on ${date}. Please delete it first or choose a different date.`);
+      throw new Error(
+        `A workout named "${workoutTitle}" already exists on ${date}. Please delete it first or choose a different date.`
+      );
     }
 
     const workoutInput: CreateWorkoutInput = {
