@@ -39,7 +39,9 @@ export function LoginScreen() {
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             Gym LogBook
           </h1>
-          <p className="text-sm sm:text-base text-slate-400">Track your training progress</p>
+          <p className="text-sm sm:text-base text-slate-400">
+            Track your training progress
+          </p>
         </div>
 
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-5 sm:p-8">

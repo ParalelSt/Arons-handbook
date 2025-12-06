@@ -51,7 +51,9 @@ export function Header({ title, onBack, action }: HeaderProps) {
               </svg>
             </button>
           )}
-          <h1 className="text-lg sm:text-xl font-bold text-white truncate">{title}</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-white truncate">
+            {title}
+          </h1>
         </div>
         {action && <div className="flex-shrink-0">{action}</div>}
       </div>

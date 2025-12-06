@@ -65,7 +65,9 @@ export function TextArea({
 }: TextAreaProps) {
   return (
     <div className="flex flex-col gap-1.5 sm:gap-2">
-      <label className="text-xs sm:text-sm font-medium text-slate-300">{label}</label>
+      <label className="text-xs sm:text-sm font-medium text-slate-300">
+        {label}
+      </label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}

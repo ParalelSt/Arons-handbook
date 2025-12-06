@@ -51,13 +51,21 @@ export function HomeScreen() {
         title="Gym Logbook"
         action={
           <div className="flex gap-1 sm:gap-2">
-            <Button variant="secondary" onClick={() => navigate('/templates')} className="hidden sm:inline-flex">
+            <Button
+              variant="secondary"
+              onClick={() => navigate("/templates")}
+              className="hidden sm:inline-flex"
+            >
               Templates
             </Button>
-            <Button variant="secondary" onClick={() => navigate('/exercises')} className="hidden sm:inline-flex">
+            <Button
+              variant="secondary"
+              onClick={() => navigate("/exercises")}
+              className="hidden sm:inline-flex"
+            >
               Exercises
             </Button>
-            <Button onClick={() => navigate('/workout/new')}>
+            <Button onClick={() => navigate("/workout/new")}>
               <Plus className="w-4 h-4 sm:w-5 sm:h-5 inline sm:mr-1" />
               <span className="hidden sm:inline">New</span>
             </Button>
@@ -68,10 +76,10 @@ export function HomeScreen() {
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Mobile Navigation */}
         <div className="sm:hidden grid grid-cols-2 gap-2 mb-4">
-          <Button variant="secondary" onClick={() => navigate('/templates')}>
+          <Button variant="secondary" onClick={() => navigate("/templates")}>
             Templates
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/exercises')}>
+          <Button variant="secondary" onClick={() => navigate("/exercises")}>
             Exercises
           </Button>
         </div>

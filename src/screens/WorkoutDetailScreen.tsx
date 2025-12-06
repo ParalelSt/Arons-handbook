@@ -145,12 +145,16 @@ export function WorkoutDetailScreen() {
                                 reps
                               </span>
                             </div>
-                            <span className="text-slate-600 hidden sm:inline">@</span>
+                            <span className="text-slate-600 hidden sm:inline">
+                              @
+                            </span>
                             <div className="flex items-center gap-1 sm:gap-2">
                               <span className="text-white font-semibold text-base sm:text-lg">
                                 {set.weight}
                               </span>
-                              <span className="text-slate-400 text-xs sm:text-sm">kg</span>
+                              <span className="text-slate-400 text-xs sm:text-sm">
+                                kg
+                              </span>
                             </div>
                           </div>
                         </div>

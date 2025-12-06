@@ -93,7 +93,7 @@ export function TemplatesScreen() {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        {loading ? (
+        {loading && (
           <div className="text-center py-12">
             <div className="text-slate-400">Loading templates...</div>
           </div>
