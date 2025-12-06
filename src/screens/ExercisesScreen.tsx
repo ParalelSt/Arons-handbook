@@ -150,7 +150,12 @@ export function ExercisesScreen() {
                       <Edit2 className="w-4 h-4 text-blue-400" />
                     </button>
                     <button
-                      onClick={() => setDeleteConfirm({ id: exercise.id, name: exercise.name })}
+                      onClick={() =>
+                        setDeleteConfirm({
+                          id: exercise.id,
+                          name: exercise.name,
+                        })
+                      }
                       className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
                     >
                       <Trash2 className="w-4 h-4 text-red-400" />

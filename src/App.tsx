@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "@/lib/auth";
+import { PWAPrompt } from "@/components/ui/PWAPrompt";
 import { LoginScreen } from "@/screens/LoginScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { WeekDetailScreen } from "@/screens/WeekDetailScreen";
@@ -47,6 +48,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <PWAPrompt />
       <Routes>
         <Route
           path="/login"

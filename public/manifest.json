@@ -3,10 +3,12 @@
   "short_name": "Gym Log",
   "description": "Track your gym workouts and progress",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#1e293b",
   "orientation": "portrait",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
@@ -22,5 +24,18 @@
     }
   ],
   "categories": ["health", "fitness", "lifestyle"],
-  "screenshots": []
+  "screenshots": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
 }

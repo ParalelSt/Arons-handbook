@@ -36,11 +36,7 @@ export function ConfirmDialog({
         <p className="text-sm sm:text-base text-slate-300 mb-6">{message}</p>
 
         <div className="flex gap-3">
-          <Button
-            onClick={onCancel}
-            variant="secondary"
-            className="flex-1"
-          >
+          <Button onClick={onCancel} variant="secondary" className="flex-1">
             {cancelLabel}
           </Button>
           <Button

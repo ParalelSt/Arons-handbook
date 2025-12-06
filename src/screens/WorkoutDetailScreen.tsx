@@ -105,7 +105,8 @@ export function WorkoutDetailScreen() {
           const goal = goals.find((g) => g.exercise_id === we.exercise_id);
           if (goal && we.sets) {
             const meetsGoal = we.sets.some((set) => {
-              const repsMatch = !goal.target_reps || set.reps >= goal.target_reps;
+              const repsMatch =
+                !goal.target_reps || set.reps >= goal.target_reps;
               const weightMatch =
                 !goal.target_weight || set.weight >= goal.target_weight;
               return repsMatch && weightMatch;
@@ -118,9 +119,7 @@ export function WorkoutDetailScreen() {
         });
 
         if (achievedGoals.length > 0) {
-          setGoalToast(
-            `🎉 You hit your goal for ${achievedGoals.join(", ")}!`
-          );
+          setGoalToast(`🎉 You hit your goal for ${achievedGoals.join(", ")}!`);
         }
       }
 
