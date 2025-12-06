@@ -35,8 +35,7 @@ export function Header({ title, onBack, action }: HeaderProps) {
   return (
     <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-10">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1 sm:gap-2">
-          <ThemeSelector />
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onBack && (
             <button
               onClick={onBack}
@@ -62,7 +61,10 @@ export function Header({ title, onBack, action }: HeaderProps) {
             {title}
           </h1>
         </div>
-        {action && <div className="flex-shrink-0">{action}</div>}
+        <div className="flex items-center gap-2">
+          {action && <div className="flex-shrink-0">{action}</div>}
+          <ThemeSelector />
+        </div>
       </div>
     </header>
   );

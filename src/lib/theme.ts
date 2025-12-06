@@ -39,24 +39,23 @@ export const themes = {
       primaryDark: "#b91c1c", // red-700
       primaryAlt: "#991b1b", // red-800
       bg: {
-        gradient: "from-slate-950 via-red-950 to-slate-950",
+        gradient: "from-slate-950 to-slate-900",
         card: "bg-slate-900/70",
-        cardHover: "hover:bg-slate-800/90",
-        input: "bg-slate-900",
+        cardHover: "hover:bg-slate-800",
+        input: "bg-slate-800",
       },
       text: {
         primary: "text-white",
-        secondary: "text-slate-200",
-        muted: "text-slate-400",
+        secondary: "text-slate-300",
+        muted: "text-slate-500",
       },
       border: {
-        primary: "border-red-800/50",
-        light: "border-red-700/40",
+        primary: "border-slate-700",
+        light: "border-slate-600",
       },
       button: {
         primary: "bg-red-600 hover:bg-red-700 text-white",
-        secondary:
-          "bg-red-900/40 hover:bg-red-800/60 text-white border border-red-700/50",
+        secondary: "bg-red-900/50 hover:bg-red-800 text-white",
         accent:
           "bg-red-600/20 border border-red-500/50 hover:bg-red-600/30 hover:border-red-500",
       },
