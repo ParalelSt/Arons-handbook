@@ -21,7 +21,7 @@ export function ThemeSelector() {
       </button>
 
       {showMenu && (
-        <div className="absolute right-0 top-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-3 min-w-[180px] z-50">
+        <div className="absolute -right-32 sm:right-0 top-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-3 w-[180px] z-50">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-white">Theme</h3>
             <button
