@@ -82,11 +82,15 @@ function App() {
           />
           <Route
             path="/templates/new"
-            element={user ? <AddEditTemplateScreen /> : <Navigate to="/login" />}
+            element={
+              user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
+            }
           />
           <Route
             path="/templates/:templateId/edit"
-            element={user ? <AddEditTemplateScreen /> : <Navigate to="/login" />}
+            element={
+              user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
+            }
           />
           <Route
             path="/goals"

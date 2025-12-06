@@ -12,7 +12,7 @@ interface ContainerProps {
 export function Container({ children, className }: ContainerProps) {
   const { currentTheme } = useTheme();
   const theme = getTheme(currentTheme);
-  
+
   return (
     <div
       className={cn(
@@ -111,7 +111,7 @@ export function Button({
 }: ButtonProps) {
   const { currentTheme } = useTheme();
   const theme = getTheme(currentTheme);
-  
+
   const variants = {
     primary: theme.colors.button.primary,
     secondary: theme.colors.button.secondary,

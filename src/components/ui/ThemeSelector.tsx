@@ -1,14 +1,14 @@
-import { useTheme } from '@/contexts/ThemeContext';
-import { themes } from '@/lib/theme';
-import type { Theme } from '@/lib/theme';
-import { Palette, X } from 'lucide-react';
-import { useState } from 'react';
+import { useTheme } from "@/contexts/ThemeContext";
+import { themes } from "@/lib/theme";
+import type { Theme } from "@/lib/theme";
+import { Palette, X } from "lucide-react";
+import { useState } from "react";
 
 export function ThemeSelector() {
   const { currentTheme, setTheme } = useTheme();
   const [showMenu, setShowMenu] = useState(false);
 
-  const themeList: Theme[] = ['blue', 'red', 'slate'];
+  const themeList: Theme[] = ["blue", "red", "slate"];
 
   return (
     <div className="relative">
@@ -42,18 +42,18 @@ export function ThemeSelector() {
                 }}
                 className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
                   currentTheme === theme
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-300 hover:bg-slate-700'
+                    ? "bg-blue-600 text-white"
+                    : "text-slate-300 hover:bg-slate-700"
                 }`}
               >
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-3 h-3 rounded-full ${
-                      theme === 'blue'
-                        ? 'bg-blue-500'
-                        : theme === 'red'
-                          ? 'bg-red-500'
-                          : 'bg-slate-500'
+                      theme === "blue"
+                        ? "bg-blue-500"
+                        : theme === "red"
+                        ? "bg-red-500"
+                        : "bg-slate-500"
                     }`}
                   ></div>
                   {themes[theme].name}
