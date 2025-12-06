@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Modal, Input } from "@/components/ui/Form";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { templateApi } from "@/lib/templates";
 import type { WorkoutTemplateWithExercises } from "@/types";
@@ -24,6 +25,8 @@ export function TemplatesScreen() {
   const [workoutDate, setWorkoutDate] = useState(
     format(new Date(), "yyyy-MM-dd")
   );
+  const [deleteConfirm, setDeleteConfirm] =
+    useState<WorkoutTemplateWithExercises | null>(null);
 
   useEffect(() => {
     loadTemplates();
@@ -62,16 +65,18 @@ export function TemplatesScreen() {
     }
   }
 
-  async function handleDelete(template: WorkoutTemplateWithExercises) {
-    if (!confirm(`Delete template "${template.name}"?`)) return;
+  async function handleDelete() {
+    if (!deleteConfirm) return;
 
     try {
       setError("");
-      await templateApi.delete(template.id);
+      await templateApi.delete(deleteConfirm.id);
+      setDeleteConfirm(null);
       loadTemplates();
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to delete template");
+      setDeleteConfirm(null);
     }
   }
 
@@ -202,7 +207,7 @@ export function TemplatesScreen() {
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(template)}
+                    onClick={() => setDeleteConfirm(template)}
                     className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
                   >
                     <Trash2 className="w-4 h-4 text-red-400" />
@@ -285,6 +290,17 @@ export function TemplatesScreen() {
           </div>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm !== null}
+        title="Delete Template"
+        message={`Are you sure you want to delete "${deleteConfirm?.name}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        isDestructive={true}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </Container>
   );
 }

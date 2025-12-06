@@ -3,8 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Input } from "@/components/ui/Form";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Toast } from "@/components/ui/Toast";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { workoutApi, setApi } from "@/lib/api";
+import { workoutApi, setApi, goalApi } from "@/lib/api";
 import type { WorkoutWithExercises } from "@/types";
 import { format, parseISO } from "date-fns";
 import { Plus, Trash2, Edit2, Save, X } from "lucide-react";
@@ -15,11 +17,13 @@ export function WorkoutDetailScreen() {
   const [workout, setWorkout] = useState<WorkoutWithExercises | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const [isEditing, setIsEditing] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [editedSets, setEditedSets] = useState<
     Record<string, { reps: number; weight: number }>
   >({});
   const [saving, setSaving] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [goalToast, setGoalToast] = useState<string | null>(null);
 
   useEffect(() => {
     if (workoutId) {
@@ -43,7 +47,7 @@ export function WorkoutDetailScreen() {
   }, [workoutId]);
 
   async function handleDelete() {
-    if (!workoutId || !confirm("Delete this workout?")) return;
+    if (!workoutId) return;
 
     try {
       setError("");
@@ -52,6 +56,8 @@ export function WorkoutDetailScreen() {
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to delete workout");
+    } finally {
+      setDeleteConfirm(false);
     }
   }
 
@@ -66,11 +72,11 @@ export function WorkoutDetailScreen() {
       });
     });
     setEditedSets(sets);
-    setIsEditing(true);
+    setEditing(true);
   }
 
   function cancelEditing() {
-    setIsEditing(false);
+    setEditing(false);
     setEditedSets({});
   }
 
@@ -90,9 +96,35 @@ export function WorkoutDetailScreen() {
       if (workoutId) {
         const data = await workoutApi.getById(workoutId);
         setWorkout(data);
+
+        // Check for goal achievements
+        const goals = await goalApi.getAll();
+        const achievedGoals: string[] = [];
+
+        data.workout_exercises.forEach((we) => {
+          const goal = goals.find((g) => g.exercise_id === we.exercise_id);
+          if (goal && we.sets) {
+            const meetsGoal = we.sets.some((set) => {
+              const repsMatch = !goal.target_reps || set.reps >= goal.target_reps;
+              const weightMatch =
+                !goal.target_weight || set.weight >= goal.target_weight;
+              return repsMatch && weightMatch;
+            });
+
+            if (meetsGoal && we.exercise?.name) {
+              achievedGoals.push(we.exercise.name);
+            }
+          }
+        });
+
+        if (achievedGoals.length > 0) {
+          setGoalToast(
+            `🎉 You hit your goal for ${achievedGoals.join(", ")}!`
+          );
+        }
       }
 
-      setIsEditing(false);
+      setEditing(false);
       setEditedSets({});
     } catch (err: any) {
       console.error(err);
@@ -152,7 +184,7 @@ export function WorkoutDetailScreen() {
         onBack={() => navigate(-1)}
         action={
           <div className="flex gap-2">
-            {isEditing ? (
+            {editing ? (
               <>
                 <Button
                   variant="secondary"
@@ -170,7 +202,7 @@ export function WorkoutDetailScreen() {
                 <Button variant="secondary" onClick={startEditing}>
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button variant="danger" onClick={handleDelete}>
+                <Button variant="danger" onClick={() => setDeleteConfirm(true)}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </>
@@ -242,7 +274,7 @@ export function WorkoutDetailScreen() {
                           <span className="text-slate-500 font-medium w-12 text-xs sm:text-sm flex-shrink-0">
                             Set {setIndex + 1}
                           </span>
-                          {isEditing ? (
+                          {editing ? (
                             <div className="flex items-center gap-2 flex-1">
                               <Input
                                 label=""
@@ -315,6 +347,25 @@ export function WorkoutDetailScreen() {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm}
+        title="Delete Workout"
+        message="Are you sure you want to delete this workout? This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        isDestructive={true}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm(false)}
+      />
+
+      {goalToast && (
+        <Toast
+          message={goalToast}
+          duration={5000}
+          onDismiss={() => setGoalToast(null)}
+        />
+      )}
     </Container>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Input } from "@/components/ui/Form";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { exerciseApi, goalApi } from "@/lib/api";
 import type { Exercise, ExerciseGoal } from "@/types";
@@ -20,6 +21,7 @@ export function GoalsScreen() {
   const [edited, setEdited] = useState<Set<string>>(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -99,23 +101,25 @@ export function GoalsScreen() {
     }
   }
 
-  async function deleteGoal(exerciseId: string) {
-    if (!confirm("Delete this goal?")) return;
+  async function deleteGoal() {
+    if (!deleteConfirm) return;
 
     try {
       setError("");
-      await goalApi.delete(exerciseId);
+      await goalApi.delete(deleteConfirm);
 
       const newGoals = { ...goals };
-      delete newGoals[exerciseId];
+      delete newGoals[deleteConfirm];
       setGoals(newGoals);
 
       const newEdited = new Set(edited);
-      newEdited.delete(exerciseId);
+      newEdited.delete(deleteConfirm);
       setEdited(newEdited);
+      setDeleteConfirm(null);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to delete goal");
+      setDeleteConfirm(null);
     }
   }
 
@@ -202,7 +206,7 @@ export function GoalsScreen() {
                           {exercise?.name}
                         </h3>
                         <button
-                          onClick={() => deleteGoal(id)}
+                          onClick={() => setDeleteConfirm(id)}
                           className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4 text-slate-400" />
@@ -329,6 +333,17 @@ export function GoalsScreen() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteConfirm !== null}
+        title="Delete Goal"
+        message={`Are you sure you want to delete this goal? This cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        isDestructive={true}
+        onConfirm={deleteGoal}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </Container>
   );
 }

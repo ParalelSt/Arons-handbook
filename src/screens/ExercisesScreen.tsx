@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Input, Modal } from "@/components/ui/Form";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { exerciseApi } from "@/lib/api";
 import type { Exercise } from "@/types";
@@ -18,6 +19,10 @@ export function ExercisesScreen() {
 
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
   const [editName, setEditName] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     loadExercises();
@@ -56,16 +61,18 @@ export function ExercisesScreen() {
     }
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(`Delete "${name}"?`)) return;
+  async function handleDelete(id: string) {
+    if (!deleteConfirm) return;
 
     try {
       setError("");
       await exerciseApi.delete(id);
+      setDeleteConfirm(null);
       loadExercises();
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to delete exercise");
+      setDeleteConfirm(null);
     }
   }
 
@@ -143,7 +150,7 @@ export function ExercisesScreen() {
                       <Edit2 className="w-4 h-4 text-blue-400" />
                     </button>
                     <button
-                      onClick={() => handleDelete(exercise.id, exercise.name)}
+                      onClick={() => setDeleteConfirm({ id: exercise.id, name: exercise.name })}
                       className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
                     >
                       <Trash2 className="w-4 h-4 text-red-400" />
@@ -227,6 +234,17 @@ export function ExercisesScreen() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm !== null}
+        title="Delete Exercise"
+        message={`Are you sure you want to delete "${deleteConfirm?.name}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        isDestructive={true}
+        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm.id)}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </Container>
   );
 }
