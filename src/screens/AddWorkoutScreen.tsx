@@ -35,6 +35,9 @@ export function AddWorkoutScreen() {
   const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>(
     []
   );
+  const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(
+    null
+  );
 
   // Load draft on mount
   useEffect(() => {
@@ -83,6 +86,7 @@ export function AddWorkoutScreen() {
   async function useTemplate(template: WorkoutTemplateWithExercises) {
     try {
       setError("");
+      setLoadingTemplateId(template.id);
       const workoutId = await templateApi.createWorkoutFromTemplate(
         template.id,
         date,
@@ -92,6 +96,7 @@ export function AddWorkoutScreen() {
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to create workout from template");
+      setLoadingTemplateId(null);
     }
   }
 
@@ -201,18 +206,32 @@ export function AddWorkoutScreen() {
                 <button
                   key={template.id}
                   onClick={() => useTemplate(template)}
-                  className="text-left p-4 rounded-lg bg-blue-600/20 border border-blue-500/50 hover:bg-blue-600/30 hover:border-blue-500 transition-all"
+                  disabled={loadingTemplateId !== null}
+                  className={`text-left p-4 rounded-lg border transition-all ${
+                    loadingTemplateId === template.id
+                      ? "bg-blue-600 border-blue-500 ring-2 ring-blue-400 opacity-90"
+                      : "bg-blue-600/20 border-blue-500/50 hover:bg-blue-600/30 hover:border-blue-500"
+                  } ${loadingTemplateId !== null && loadingTemplateId !== template.id ? "opacity-50" : ""}`}
                 >
-                  <p className="font-medium text-white mb-1">{template.name}</p>
-                  <p className="text-sm text-slate-300">
-                    {template.template_exercises.length} exercise
-                    {template.template_exercises.length !== 1 ? "s" : ""}
-                  </p>
-                  {template.description && (
-                    <p className="text-xs text-slate-400 mt-1">
-                      {template.description}
-                    </p>
-                  )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="font-medium text-white mb-1">{template.name}</p>
+                      <p className="text-sm text-slate-300">
+                        {template.template_exercises.length} exercise
+                        {template.template_exercises.length !== 1 ? "s" : ""}
+                      </p>
+                      {template.description && (
+                        <p className="text-xs text-slate-400 mt-1">
+                          {template.description}
+                        </p>
+                      )}
+                    </div>
+                    {loadingTemplateId === template.id && (
+                      <div className="ml-3 flex items-center">
+                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      </div>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
