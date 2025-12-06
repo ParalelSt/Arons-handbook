@@ -6,6 +6,7 @@ import type {
   WeekWorkouts,
   CreateWorkoutInput,
   Set,
+  ExerciseGoal,
 } from "@/types";
 import { startOfWeek, endOfWeek, format, parseISO } from "date-fns";
 
@@ -277,5 +278,72 @@ export const setApi = {
 
     if (error) throw error;
     return data;
+  },
+};
+
+/**
+ * Exercise Goals Management
+ */
+export const goalApi = {
+  // Get all goals for the current user
+  async getAll(): Promise<ExerciseGoal[]> {
+    const { data, error } = await supabase
+      .from("exercise_goals")
+      .select("*, exercise:exercises(*)")
+      .order("exercise_id", { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Get goal for a specific exercise
+  async getByExerciseId(exerciseId: string): Promise<ExerciseGoal | null> {
+    const { data, error } = await supabase
+      .from("exercise_goals")
+      .select("*, exercise:exercises(*)")
+      .eq("exercise_id", exerciseId)
+      .single();
+
+    if (error && error.code !== "PGRST116") throw error; // PGRST116 = no rows
+    return data || null;
+  },
+
+  // Create or update a goal
+  async upsert(
+    exerciseId: string,
+    targetReps?: number,
+    targetWeight?: number
+  ): Promise<ExerciseGoal> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const { data, error } = await supabase
+      .from("exercise_goals")
+      .upsert(
+        {
+          exercise_id: exerciseId,
+          user_id: user.id,
+          target_reps: targetReps,
+          target_weight: targetWeight,
+        },
+        { onConflict: "user_id,exercise_id" }
+      )
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Delete a goal
+  async delete(exerciseId: string): Promise<void> {
+    const { error } = await supabase
+      .from("exercise_goals")
+      .delete()
+      .eq("exercise_id", exerciseId);
+
+    if (error) throw error;
   },
 };

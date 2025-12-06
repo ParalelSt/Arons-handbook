@@ -9,6 +9,7 @@ import { AddWorkoutScreen } from "@/screens/AddWorkoutScreen";
 import { ExercisesScreen } from "@/screens/ExercisesScreen";
 import { TemplatesScreen } from "@/screens/TemplatesScreen";
 import { AddEditTemplateScreen } from "@/screens/AddEditTemplateScreen";
+import { GoalsScreen } from "@/screens/GoalsScreen";
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -82,6 +83,10 @@ function App() {
         <Route
           path="/templates/:templateId/edit"
           element={user ? <AddEditTemplateScreen /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/goals"
+          element={user ? <GoalsScreen /> : <Navigate to="/login" />}
         />
       </Routes>
     </BrowserRouter>

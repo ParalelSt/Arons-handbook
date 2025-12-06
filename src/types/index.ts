@@ -10,6 +10,17 @@ export interface Exercise {
   created_at: string;
 }
 
+export interface ExerciseGoal {
+  id: string;
+  user_id: string;
+  exercise_id: string;
+  exercise?: Exercise;
+  target_reps?: number;
+  target_weight?: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Set {
   id: string;
   workout_exercise_id: string;

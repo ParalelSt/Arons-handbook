@@ -303,7 +303,7 @@ export function AddEditTemplateScreen() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="grid grid-cols-1 gap-3 mb-4">
                       <Input
                         label="Target Sets"
                         type="number"
@@ -315,31 +315,6 @@ export function AddEditTemplateScreen() {
                         }
                         min={1}
                         required
-                      />
-                      <Input
-                        label="Target Reps"
-                        type="number"
-                        value={exercise.target_reps || ""}
-                        onChange={(v) =>
-                          updateExercise(index, {
-                            target_reps: v ? parseInt(v) : undefined,
-                          })
-                        }
-                        placeholder="Optional"
-                        min={0}
-                      />
-                      <Input
-                        label="Target Weight"
-                        type="number"
-                        value={exercise.target_weight || ""}
-                        onChange={(v) =>
-                          updateExercise(index, {
-                            target_weight: v ? parseFloat(v) : undefined,
-                          })
-                        }
-                        placeholder="kg"
-                        min={0}
-                        step={0.5}
                       />
                     </div>
 
