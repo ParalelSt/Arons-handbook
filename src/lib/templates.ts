@@ -199,11 +199,12 @@ export const templateApi = {
       notes: template.description || undefined,
       exercises: template.template_exercises.map((te) => ({
         exercise_id: te.exercise_id,
-        sets: Array(te.target_sets)
+        // Ensure sets pass DB checks (reps > 0). Default to at least one set and rep if missing.
+        sets: Array(Math.max(1, te.target_sets || 1))
           .fill({})
           .map(() => ({
-            reps: te.target_reps ?? 0, // Leave reps open for logging time
-            weight: 0, // Start at 0kg so user can log actual weight
+            reps: te.target_reps && te.target_reps > 0 ? te.target_reps : 1,
+            weight: te.target_weight ?? 0,
           })),
         notes: te.notes || undefined,
       })),
