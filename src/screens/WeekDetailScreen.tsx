@@ -77,7 +77,16 @@ export function WeekDetailScreen() {
         title={`Week ${weekNumber}`}
         onBack={() => navigate("/")}
         action={
-          <Button onClick={() => navigate(`/workout/new?date=${format(new Date(weekStart || new Date()), "yyyy-MM-dd")}&weekStart=${weekStart}`)}>
+          <Button
+            onClick={() =>
+              navigate(
+                `/workout/new?date=${format(
+                  new Date(weekStart || new Date()),
+                  "yyyy-MM-dd"
+                )}&weekStart=${weekStart}`
+              )
+            }
+          >
             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         }
@@ -143,7 +152,10 @@ export function WeekDetailScreen() {
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(
-                            `/workout/new?date=${format(day, "yyyy-MM-dd")}&weekStart=${weekStart}`
+                            `/workout/new?date=${format(
+                              day,
+                              "yyyy-MM-dd"
+                            )}&weekStart=${weekStart}`
                           );
                         }}
                       >

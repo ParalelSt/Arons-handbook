@@ -185,14 +185,21 @@ export function AddWorkoutScreen() {
     <Container>
       <Header title="New Workout" onBack={() => navigate(-1)} />
       <Breadcrumbs
-        items={presetWeekStart ? [
-          { label: "Home", onClick: () => navigate("/") },
-          { label: `Week`, onClick: () => navigate(`/week/${presetWeekStart}`) },
-          { label: "New Workout" },
-        ] : [
-          { label: "Home", onClick: () => navigate("/") },
-          { label: "New Workout" },
-        ]}
+        items={
+          presetWeekStart
+            ? [
+                { label: "Home", onClick: () => navigate("/") },
+                {
+                  label: `Week`,
+                  onClick: () => navigate(`/week/${presetWeekStart}`),
+                },
+                { label: "New Workout" },
+              ]
+            : [
+                { label: "Home", onClick: () => navigate("/") },
+                { label: "New Workout" },
+              ]
+        }
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
@@ -216,11 +223,18 @@ export function AddWorkoutScreen() {
                     loadingTemplateId === template.id
                       ? "bg-blue-600 border-blue-500 ring-2 ring-blue-400 opacity-90"
                       : "bg-blue-600/20 border-blue-500/50 hover:bg-blue-600/30 hover:border-blue-500"
-                  } ${loadingTemplateId !== null && loadingTemplateId !== template.id ? "opacity-50" : ""}`}
+                  } ${
+                    loadingTemplateId !== null &&
+                    loadingTemplateId !== template.id
+                      ? "opacity-50"
+                      : ""
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <p className="font-medium text-white mb-1">{template.name}</p>
+                      <p className="font-medium text-white mb-1">
+                        {template.name}
+                      </p>
                       <p className="text-sm text-slate-300">
                         {template.template_exercises.length} exercise
                         {template.template_exercises.length !== 1 ? "s" : ""}

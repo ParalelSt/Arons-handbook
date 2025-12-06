@@ -7,14 +7,15 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
       setDeferredPrompt(event as BeforeInstallPromptEvent);
-      
+
       // Check if user has dismissed this before
       const dismissed = localStorage.getItem("pwa-install-dismissed");
       if (!dismissed) {
@@ -32,7 +33,10 @@ export function PWAPrompt() {
     window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
@@ -61,7 +65,9 @@ export function PWAPrompt() {
       <div className="flex items-start gap-3">
         <div className="flex-1">
           <h3 className="font-semibold text-white mb-1">Install App</h3>
-          <p className="text-sm text-slate-300">Add Gym Logbook to your home screen for quick access</p>
+          <p className="text-sm text-slate-300">
+            Add Gym Logbook to your home screen for quick access
+          </p>
           <div className="flex gap-2 mt-3">
             <button
               onClick={handleInstall}
