@@ -131,7 +131,9 @@ export const templateApi = {
   // Update template with exercises
   async updateWithExercises(
     id: string,
-    input: Partial<WorkoutTemplate> & { exercises?: CreateTemplateExerciseInput[] }
+    input: Partial<WorkoutTemplate> & {
+      exercises?: CreateTemplateExerciseInput[];
+    }
   ): Promise<WorkoutTemplateWithExercises> {
     // Update template metadata
     const { error: metaError } = await supabase
