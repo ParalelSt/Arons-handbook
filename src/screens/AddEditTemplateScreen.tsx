@@ -324,6 +324,38 @@ export function AddEditTemplateScreen() {
                         min={1}
                         required
                       />
+                      <Input
+                        label="Target Reps (optional)"
+                        type="number"
+                        value={
+                          typeof exercise.target_reps === "number"
+                            ? String(exercise.target_reps)
+                            : ""
+                        }
+                        onChange={(v) =>
+                          updateExercise(index, {
+                            target_reps: v === "" ? undefined : parseInt(v) || 0,
+                          })
+                        }
+                        min={1}
+                      />
+                      <Input
+                        label="Target Weight (optional)"
+                        type="number"
+                        value={
+                          typeof exercise.target_weight === "number"
+                            ? String(exercise.target_weight)
+                            : ""
+                        }
+                        onChange={(v) =>
+                          updateExercise(index, {
+                            target_weight:
+                              v === "" ? undefined : Number.isNaN(parseFloat(v)) ? undefined : parseFloat(v),
+                          })
+                        }
+                        min={0}
+                        step={0.5}
+                      />
                     </div>
 
                     <TextArea
