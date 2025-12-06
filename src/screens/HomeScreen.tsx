@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { workoutApi } from "@/lib/api";
+import { auth } from "@/lib/auth";
 import type { WeekWorkouts } from "@/types";
 import { format, parseISO } from "date-fns";
-import { ChevronRight, Plus } from "lucide-react";
+import { Plus, ChevronRight, LogOut } from "lucide-react";
 
 export function HomeScreen() {
   const navigate = useNavigate();
@@ -68,6 +69,9 @@ export function HomeScreen() {
             <Button onClick={() => navigate("/workout/new")}>
               <Plus className="w-4 h-4 sm:w-5 sm:h-5 inline sm:mr-1" />
               <span className="hidden sm:inline">New</span>
+            </Button>
+            <Button variant="secondary" onClick={handleLogout} className="p-2">
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         }
