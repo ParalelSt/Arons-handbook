@@ -58,7 +58,7 @@ export function HomeScreen() {
   return (
     <Container>
       <Header
-        title="Gym Logbook"
+        title="Aron's handbook"
         action={
           <div className="flex gap-1 sm:gap-2">
             <Button

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Input, Modal } from "@/components/ui/Form";
 import { exerciseApi } from "@/lib/api";
@@ -6,6 +7,7 @@ import type { Exercise } from "@/types";
 import { Plus, Trash2 } from "lucide-react";
 
 export function ExercisesScreen() {
+  const navigate = useNavigate();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -62,6 +64,7 @@ export function ExercisesScreen() {
     <Container>
       <Header
         title="Exercises"
+        onBack={() => navigate("/")}
         action={
           <Button onClick={() => setShowAddModal(true)}>
             <Plus className="w-5 h-5" />
