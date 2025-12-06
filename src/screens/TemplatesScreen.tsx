@@ -160,7 +160,7 @@ export function TemplatesScreen() {
                       <span className="text-slate-600 ml-2">
                         {te.target_sets} sets
                         {te.target_reps && ` × ${te.target_reps} reps`}
-                        {te.target_weight && ` @ ${te.target_weight}kg`}
+                        {te.target_weight && ` × ${te.target_weight}kg`}
                       </span>
                     </div>
                   ))}

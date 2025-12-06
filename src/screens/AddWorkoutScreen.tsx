@@ -232,7 +232,7 @@ export function AddWorkoutScreen() {
                             placeholder="Reps"
                             min={0}
                           />
-                          <span className="text-slate-500">@</span>
+                          <span className="text-slate-500">×</span>
                           <Input
                             label=""
                             type="number"
@@ -323,15 +323,17 @@ export function AddWorkoutScreen() {
           </div>
         ) : (
           <div className="space-y-2">
-            {availableExercises.map((exercise) => (
-              <button
-                key={exercise.id}
-                onClick={() => addExercise(exercise)}
-                className="w-full text-left p-4 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-700 hover:border-slate-600 transition-all"
-              >
-                <p className="text-white font-medium">{exercise.name}</p>
-              </button>
-            ))}
+            {availableExercises
+              .filter((ex) => !exercises.some((e) => e.exercise_id === ex.id))
+              .map((exercise) => (
+                <button
+                  key={exercise.id}
+                  onClick={() => addExercise(exercise)}
+                  className="w-full text-left p-4 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-700 hover:border-slate-600 transition-all"
+                >
+                  <p className="text-white font-medium">{exercise.name}</p>
+                </button>
+              ))}
           </div>
         )}
       </Modal>

@@ -5,6 +5,7 @@ import type {
   WorkoutWithExercises,
   WeekWorkouts,
   CreateWorkoutInput,
+  Set,
 } from "@/types";
 import { startOfWeek, endOfWeek, format, parseISO } from "date-fns";
 
@@ -255,5 +256,26 @@ export const workoutApi = {
     const { error } = await supabase.from("workouts").delete().eq("id", id);
 
     if (error) throw error;
+  },
+};
+
+/**
+ * Set Management
+ */
+export const setApi = {
+  // Update a set's reps and/or weight
+  async update(
+    id: string,
+    updates: { reps?: number; weight?: number }
+  ): Promise<Set> {
+    const { data, error } = await supabase
+      .from("sets")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 };

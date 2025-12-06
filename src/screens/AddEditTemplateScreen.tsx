@@ -31,18 +31,9 @@ export function AddEditTemplateScreen() {
     if (isEditing) {
       loadTemplate();
     } else {
-      // Load draft only for new templates
+      // Check for draft but don't auto-load it
       const draft = localStorage.getItem(DRAFT_KEY);
-      if (draft) {
-        try {
-          const parsed = JSON.parse(draft);
-          setName(parsed.name || "");
-          setDescription(parsed.description || "");
-          setExercises(parsed.exercises || []);
-        } catch (err) {
-          console.error("Failed to load draft:", err);
-        }
-      }
+      setHasDraft(!!draft);
     }
   }, []);
 
@@ -120,6 +111,31 @@ export function AddEditTemplateScreen() {
     setExercises(updated);
   }
 
+  function loadDraft() {
+    const draft = localStorage.getItem(DRAFT_KEY);
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        setName(parsed.name || "");
+        setDescription(parsed.description || "");
+        setExercises(parsed.exercises || []);
+        setDraftLoaded(true);
+        setHasDraft(false);
+      } catch (err) {
+        console.error("Failed to load draft:", err);
+      }
+    }
+  }
+
+  function clearDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setHasDraft(false);
+    setDraftLoaded(false);
+    setName("");
+    setDescription("");
+    setExercises([]);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (exercises.length === 0) {
@@ -188,6 +204,45 @@ export function AddEditTemplateScreen() {
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {error && (
           <ErrorMessage message={error} onDismiss={() => setError("")} />
+        )}
+
+        {hasDraft && !isEditing && (
+          <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2 text-blue-400">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="text-sm">Draft available from previous session</span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={loadDraft}
+                className="text-xs sm:text-sm py-1 px-3"
+              >
+                Restore
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={clearDraft}
+                className="text-xs sm:text-sm py-1 px-3"
+              >
+                Discard
+              </Button>
+            </div>
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -346,15 +401,17 @@ export function AddEditTemplateScreen() {
           </div>
         ) : (
           <div className="space-y-2">
-            {availableExercises.map((exercise) => (
-              <button
-                key={exercise.id}
-                onClick={() => addExercise(exercise)}
-                className="w-full text-left p-4 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-700 hover:border-slate-600 transition-all"
-              >
-                <p className="text-white font-medium">{exercise.name}</p>
-              </button>
-            ))}
+            {availableExercises
+              .filter((ex) => !exercises.some((e) => e.exercise_id === ex.id))
+              .map((exercise) => (
+                <button
+                  key={exercise.id}
+                  onClick={() => addExercise(exercise)}
+                  className="w-full text-left p-4 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-700 hover:border-slate-600 transition-all"
+                >
+                  <p className="text-white font-medium">{exercise.name}</p>
+                </button>
+              ))}
           </div>
         )}
       </Modal>

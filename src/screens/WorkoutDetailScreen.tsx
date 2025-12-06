@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
+import { Input } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { workoutApi } from "@/lib/api";
-import type { WorkoutWithExercises } from "@/types";
+import { workoutApi, setApi } from "@/lib/api";
+import type { WorkoutWithExercises, Set } from "@/types";
 import { format, parseISO } from "date-fns";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Save, X } from "lucide-react";
 
 export function WorkoutDetailScreen() {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ export function WorkoutDetailScreen() {
   const [workout, setWorkout] = useState<WorkoutWithExercises | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedSets, setEditedSets] = useState<Record<string, { reps: number; weight: number }>>({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (workoutId) {
@@ -46,6 +50,64 @@ export function WorkoutDetailScreen() {
       console.error(err);
       setError(err.message || "Failed to delete workout");
     }
+  }
+
+  function startEditing() {
+    if (!workout) return;
+    
+    // Initialize editedSets with current values
+    const sets: Record<string, { reps: number; weight: number }> = {};
+    workout.workout_exercises.forEach((we) => {
+      we.sets?.forEach((set) => {
+        sets[set.id] = { reps: set.reps, weight: set.weight };
+      });
+    });
+    setEditedSets(sets);
+    setIsEditing(true);
+  }
+
+  function cancelEditing() {
+    setIsEditing(false);
+    setEditedSets({});
+  }
+
+  async function saveEdits() {
+    try {
+      setSaving(true);
+      setError("");
+
+      // Update all modified sets
+      const updates = Object.entries(editedSets).map(([setId, values]) =>
+        setApi.update(setId, values)
+      );
+      
+      await Promise.all(updates);
+      
+      // Reload workout to show updated values
+      if (workoutId) {
+        const data = await workoutApi.getById(workoutId);
+        setWorkout(data);
+      }
+      
+      setIsEditing(false);
+      setEditedSets({});
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to save changes");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function updateEditedSet(setId: string, field: 'reps' | 'weight', value: string) {
+    const numValue = field === 'reps' ? parseInt(value) || 0 : parseFloat(value) || 0;
+    setEditedSets((prev) => ({
+      ...prev,
+      [setId]: {
+        ...prev[setId],
+        [field]: numValue,
+      },
+    }));
   }
 
   if (loading) {
@@ -82,9 +144,25 @@ export function WorkoutDetailScreen() {
         onBack={() => navigate(-1)}
         action={
           <div className="flex gap-2">
-            <Button variant="danger" onClick={handleDelete}>
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            {isEditing ? (
+              <>
+                <Button variant="secondary" onClick={cancelEditing} disabled={saving}>
+                  <X className="w-4 h-4" />
+                </Button>
+                <Button onClick={saveEdits} disabled={saving}>
+                  <Save className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="secondary" onClick={startEditing}>
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+                <Button variant="danger" onClick={handleDelete}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </>
+            )}
           </div>
         }
       />
@@ -141,32 +219,53 @@ export function WorkoutDetailScreen() {
                       workoutExercise.sets.map((set, setIndex) => (
                         <div
                           key={set.id}
-                          className="flex items-center gap-2 sm:gap-4 bg-slate-900/50 rounded-lg p-2 sm:p-3"
+                          className="flex items-center gap-2 bg-slate-900/50 rounded-lg p-2 sm:p-3"
                         >
-                          <span className="text-slate-500 font-medium w-10 sm:w-12 text-sm sm:text-base">
+                          <span className="text-slate-500 font-medium w-12 text-xs sm:text-sm flex-shrink-0">
                             Set {setIndex + 1}
                           </span>
-                          <div className="flex-1 flex items-center gap-2 sm:gap-4">
-                            <div className="flex items-center gap-1 sm:gap-2">
-                              <span className="text-white font-semibold text-base sm:text-lg">
-                                {set.reps}
-                              </span>
-                              <span className="text-slate-400 text-xs sm:text-sm">
-                                reps
-                              </span>
+                          {isEditing ? (
+                            <div className="flex items-center gap-2 flex-1">
+                              <Input
+                                label=""
+                                type="number"
+                                value={editedSets[set.id]?.reps ?? set.reps}
+                                onChange={(v) => updateEditedSet(set.id, 'reps', v)}
+                                placeholder="Reps"
+                                min={0}
+                              />
+                              <span className="text-slate-500 text-xs">×</span>
+                              <Input
+                                label=""
+                                type="number"
+                                value={editedSets[set.id]?.weight ?? set.weight}
+                                onChange={(v) => updateEditedSet(set.id, 'weight', v)}
+                                placeholder="kg"
+                                min={0}
+                                step={0.5}
+                              />
                             </div>
-                            <span className="text-slate-600 hidden sm:inline">
-                              @
-                            </span>
-                            <div className="flex items-center gap-1 sm:gap-2">
-                              <span className="text-white font-semibold text-base sm:text-lg">
-                                {set.weight}
-                              </span>
-                              <span className="text-slate-400 text-xs sm:text-sm">
-                                kg
-                              </span>
+                          ) : (
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className="flex items-center gap-1">
+                                <span className="text-white font-semibold text-sm sm:text-base">
+                                  {set.reps}
+                                </span>
+                                <span className="text-slate-400 text-xs">
+                                  reps
+                                </span>
+                              </div>
+                              <span className="text-slate-600 text-xs">×</span>
+                              <div className="flex items-center gap-1">
+                                <span className="text-white font-semibold text-sm sm:text-base">
+                                  {set.weight}
+                                </span>
+                                <span className="text-slate-400 text-xs">
+                                  kg
+                                </span>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       ))
                     ) : (
