@@ -219,12 +219,12 @@ export const workoutApi = {
 
       if (exerciseError) throw exerciseError;
 
-      // Create sets
+      // Create sets with safety checks to satisfy DB constraints
       if (exerciseInput.sets.length > 0) {
         const sets = exerciseInput.sets.map((set, j) => ({
           workout_exercise_id: workoutExercise.id,
-          reps: set.reps,
-          weight: set.weight,
+          reps: Math.max(1, set.reps ?? 0),
+          weight: Math.max(0, set.weight ?? 0),
           order_index: j,
         }));
 
