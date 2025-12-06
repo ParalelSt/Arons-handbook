@@ -15,17 +15,21 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check current user
-    auth
-      .getCurrentUser()
-      .then(setUser)
-      .finally(() => setLoading(false));
+    // Check for existing session first
+    auth.getCurrentUser()
+      .then((currentUser) => {
+        setUser(currentUser);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = auth.onAuthStateChange((user) => {
-      setUser(user);
+    } = auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
