@@ -307,7 +307,7 @@ export function AddEditTemplateScreen() {
                       <Input
                         label="Target Sets"
                         type="number"
-                        value={exercise.target_sets}
+                        value={String(exercise.target_sets)}
                         onChange={(v) =>
                           updateExercise(index, {
                             target_sets: parseInt(v) || 0,

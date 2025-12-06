@@ -50,7 +50,10 @@ export function GoalsScreen() {
     field: "reps" | "weight",
     value: string
   ) {
-    const numValue = field === "reps" ? parseInt(value) || undefined : parseFloat(value) || undefined;
+    const numValue =
+      field === "reps"
+        ? parseInt(value) || undefined
+        : parseFloat(value) || undefined;
 
     setGoals((prev) => ({
       ...prev,
@@ -168,11 +171,11 @@ export function GoalsScreen() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
                       label="Target Reps"
                       type="number"
-                      value={goal?.target_reps || ""}
+                      value={goal?.target_reps ? String(goal.target_reps) : ""}
                       onChange={(v) => updateGoal(exercise.id, "reps", v)}
                       placeholder="e.g., 12"
                       min={0}
@@ -180,7 +183,7 @@ export function GoalsScreen() {
                     <Input
                       label="Target Weight (kg)"
                       type="number"
-                      value={goal?.target_weight || ""}
+                      value={goal?.target_weight ? String(goal.target_weight) : ""}
                       onChange={(v) => updateGoal(exercise.id, "weight", v)}
                       placeholder="e.g., 50"
                       min={0}

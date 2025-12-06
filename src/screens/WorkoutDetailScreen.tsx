@@ -240,7 +240,7 @@ export function WorkoutDetailScreen() {
                               <Input
                                 label=""
                                 type="number"
-                                value={editedSets[set.id]?.reps ?? set.reps}
+                                value={String(editedSets[set.id]?.reps ?? set.reps)}
                                 onChange={(v) =>
                                   updateEditedSet(set.id, "reps", v)
                                 }
@@ -251,7 +251,7 @@ export function WorkoutDetailScreen() {
                               <Input
                                 label=""
                                 type="number"
-                                value={editedSets[set.id]?.weight ?? set.weight}
+                                value={String(editedSets[set.id]?.weight ?? set.weight)}
                                 onChange={(v) =>
                                   updateEditedSet(set.id, "weight", v)
                                 }
@@ -295,10 +295,10 @@ export function WorkoutDetailScreen() {
               <Button
                 variant="secondary"
                 className="w-full"
-                onClick={() => navigate(`/workout/${workoutId}/add-exercise`)}
+                onClick={() => navigate("/")}
               >
                 <Plus className="w-5 h-5 inline mr-2" />
-                Add Another Exercise
+                Done
               </Button>
             </>
           )}

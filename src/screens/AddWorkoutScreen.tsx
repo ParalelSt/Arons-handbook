@@ -4,7 +4,8 @@ import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Input, TextArea, Modal } from "@/components/ui/Form";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { workoutApi, exerciseApi } from "@/lib/api";
-import type { Exercise, CreateWorkoutExerciseInput } from "@/types";
+import { templateApi } from "@/lib/templates";
+import type { Exercise, CreateWorkoutExerciseInput, WorkoutTemplateWithExercises } from "@/types";
 import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
 
@@ -26,10 +27,12 @@ export function AddWorkoutScreen() {
 
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
+  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>([]);
 
   // Load draft on mount
   useEffect(() => {
     loadExercises();
+    loadTemplates();
     const draft = localStorage.getItem(DRAFT_KEY);
     if (draft && !presetDate) {
       try {
@@ -58,6 +61,30 @@ export function AddWorkoutScreen() {
       setAvailableExercises(data);
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  async function loadTemplates() {
+    try {
+      const data = await templateApi.getAll();
+      setTemplates(data);
+    } catch (err) {
+      console.error("Failed to load templates:", err);
+    }
+  }
+
+  async function useTemplate(template: WorkoutTemplateWithExercises) {
+    try {
+      setError("");
+      const workoutId = await templateApi.createWorkoutFromTemplate(
+        template.id,
+        date,
+        template.name
+      );
+      navigate(`/workout/${workoutId}`);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to create workout from template");
     }
   }
 
@@ -150,6 +177,38 @@ export function AddWorkoutScreen() {
           <ErrorMessage message={error} onDismiss={() => setError("")} />
         )}
 
+        {/* Template Recommendations */}
+        {templates.length > 0 && exercises.length === 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-white mb-3">
+              Quick Start with a Template
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {templates.map((template) => (
+                <button
+                  key={template.id}
+                  onClick={() => useTemplate(template)}
+                  className="text-left p-4 rounded-lg bg-blue-600/20 border border-blue-500/50 hover:bg-blue-600/30 hover:border-blue-500 transition-all"
+                >
+                  <p className="font-medium text-white mb-1">{template.name}</p>
+                  <p className="text-sm text-slate-300">
+                    {template.template_exercises.length} exercise
+                    {template.template_exercises.length !== 1 ? "s" : ""}
+                  </p>
+                  {template.description && (
+                    <p className="text-xs text-slate-400 mt-1">
+                      {template.description}
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-slate-400 mt-3">
+              Or create a custom workout below
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Info */}
           <Card className="p-5 space-y-4">
@@ -225,7 +284,7 @@ export function AddWorkoutScreen() {
                           <Input
                             label=""
                             type="number"
-                            value={set.reps}
+                            value={String(set.reps)}
                             onChange={(v) =>
                               updateSet(exIndex, setIndex, "reps", v)
                             }
@@ -236,7 +295,7 @@ export function AddWorkoutScreen() {
                           <Input
                             label=""
                             type="number"
-                            value={set.weight}
+                            value={String(set.weight)}
                             onChange={(v) =>
                               updateSet(exIndex, setIndex, "weight", v)
                             }
