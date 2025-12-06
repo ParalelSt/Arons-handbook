@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { workoutApi } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import type { WeekWorkouts } from "@/types";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, getISOWeek } from "date-fns";
 import { Plus, ChevronRight, LogOut } from "lucide-react";
 
 export function HomeScreen() {
@@ -42,12 +42,7 @@ export function HomeScreen() {
   }
 
   function getWeekNumber(weekStart: string): number {
-    const date = parseISO(weekStart);
-    const yearStart = new Date(date.getFullYear(), 0, 1);
-    const days = Math.floor(
-      (date.getTime() - yearStart.getTime()) / (24 * 60 * 60 * 1000)
-    );
-    return Math.ceil((days + 1) / 7);
+    return getISOWeek(parseISO(weekStart));
   }
 
   function formatDateRange(weekStart: string, weekEnd: string): string {
