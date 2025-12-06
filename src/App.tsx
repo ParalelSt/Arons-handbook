@@ -28,8 +28,8 @@ function App() {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = auth.onAuthStateChange((user) => {
+      setUser(user);
     });
 
     return () => subscription.unsubscribe();
