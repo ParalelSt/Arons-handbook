@@ -40,6 +40,35 @@ export interface Workout {
   updated_at: string;
 }
 
+// Workout Templates
+export interface WorkoutTemplate {
+  id: string;
+  user_id: string;
+  name: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TemplateExercise {
+  id: string;
+  template_id: string;
+  exercise_id: string;
+  exercise?: Exercise;
+  target_sets: number;
+  target_reps?: number;
+  target_weight?: number;
+  notes?: string;
+  order_index: number;
+  created_at: string;
+}
+
+export interface WorkoutTemplateWithExercises extends WorkoutTemplate {
+  template_exercises: (TemplateExercise & {
+    exercise: Exercise;
+  })[];
+}
+
 // View types for UI
 export interface WorkoutWithExercises extends Workout {
   workout_exercises: (WorkoutExercise & {
@@ -71,4 +100,18 @@ export interface CreateWorkoutInput {
   title?: string;
   notes?: string;
   exercises: CreateWorkoutExerciseInput[];
+}
+
+export interface CreateTemplateExerciseInput {
+  exercise_id: string;
+  target_sets: number;
+  target_reps?: number;
+  target_weight?: number;
+  notes?: string;
+}
+
+export interface CreateTemplateInput {
+  name: string;
+  description?: string;
+  exercises: CreateTemplateExerciseInput[];
 }

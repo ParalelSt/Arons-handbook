@@ -28,12 +28,12 @@ interface HeaderProps {
 export function Header({ title, onBack, action }: HeaderProps) {
   return (
     <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-10">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onBack && (
             <button
               onClick={onBack}
-              className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
               aria-label="Go back"
             >
               <svg
@@ -51,9 +51,9 @@ export function Header({ title, onBack, action }: HeaderProps) {
               </svg>
             </button>
           )}
-          <h1 className="text-xl font-bold text-white">{title}</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-white truncate">{title}</h1>
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="flex-shrink-0">{action}</div>}
       </div>
     </header>
   );
@@ -110,7 +110,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "px-4 py-2 rounded-lg font-medium transition-colors",
+        "px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         variants[variant],
         className

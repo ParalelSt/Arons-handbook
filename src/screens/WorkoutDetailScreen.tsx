@@ -76,28 +76,28 @@ export function WorkoutDetailScreen() {
         onBack={() => navigate(-1)}
         action={
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={handleDelete}>
+            <Button variant="danger" onClick={handleDelete}>
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         }
       />
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Date and notes */}
-        <div className="mb-6">
-          <p className="text-slate-400 text-sm mb-2">
+        <div className="mb-4 sm:mb-6">
+          <p className="text-slate-400 text-xs sm:text-sm mb-2">
             {format(workoutDate, "MMMM d, yyyy")}
           </p>
           {workout.notes && (
-            <Card className="p-4">
+            <Card className="p-3 sm:p-4">
               <p className="text-slate-300 text-sm">{workout.notes}</p>
             </Card>
           )}
         </div>
 
         {/* Exercises list */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {workout.workout_exercises.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-slate-400 mb-4">No exercises logged yet</p>
@@ -111,10 +111,10 @@ export function WorkoutDetailScreen() {
           ) : (
             <>
               {workout.workout_exercises.map((workoutExercise) => (
-                <Card key={workoutExercise.id} className="p-5">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white mb-1">
+                <Card key={workoutExercise.id} className="p-4 sm:p-5">
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-white mb-1 truncate">
                         {workoutExercise.exercise?.name || "Unknown Exercise"}
                       </h3>
                       {workoutExercise.notes && (
@@ -131,26 +131,26 @@ export function WorkoutDetailScreen() {
                       workoutExercise.sets.map((set, setIndex) => (
                         <div
                           key={set.id}
-                          className="flex items-center gap-4 bg-slate-900/50 rounded-lg p-3"
+                          className="flex items-center gap-2 sm:gap-4 bg-slate-900/50 rounded-lg p-2 sm:p-3"
                         >
-                          <span className="text-slate-500 font-medium w-12">
+                          <span className="text-slate-500 font-medium w-10 sm:w-12 text-sm sm:text-base">
                             Set {setIndex + 1}
                           </span>
-                          <div className="flex-1 flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                              <span className="text-white font-semibold text-lg">
+                          <div className="flex-1 flex items-center gap-2 sm:gap-4">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <span className="text-white font-semibold text-base sm:text-lg">
                                 {set.reps}
                               </span>
-                              <span className="text-slate-400 text-sm">
+                              <span className="text-slate-400 text-xs sm:text-sm">
                                 reps
                               </span>
                             </div>
-                            <span className="text-slate-600">@</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-white font-semibold text-lg">
+                            <span className="text-slate-600 hidden sm:inline">@</span>
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <span className="text-white font-semibold text-base sm:text-lg">
                                 {set.weight}
                               </span>
-                              <span className="text-slate-400 text-sm">kg</span>
+                              <span className="text-slate-400 text-xs sm:text-sm">kg</span>
                             </div>
                           </div>
                         </div>

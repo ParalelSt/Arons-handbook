@@ -50,19 +50,32 @@ export function HomeScreen() {
       <Header
         title="Gym Logbook"
         action={
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => navigate("/exercises")}>
+          <div className="flex gap-1 sm:gap-2">
+            <Button variant="secondary" onClick={() => navigate('/templates')} className="hidden sm:inline-flex">
+              Templates
+            </Button>
+            <Button variant="secondary" onClick={() => navigate('/exercises')} className="hidden sm:inline-flex">
               Exercises
             </Button>
-            <Button onClick={() => navigate("/workout/new")}>
-              <Plus className="w-5 h-5 inline mr-1" />
-              New
+            <Button onClick={() => navigate('/workout/new')}>
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 inline sm:mr-1" />
+              <span className="hidden sm:inline">New</span>
             </Button>
           </div>
         }
       />
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        {/* Mobile Navigation */}
+        <div className="sm:hidden grid grid-cols-2 gap-2 mb-4">
+          <Button variant="secondary" onClick={() => navigate('/templates')}>
+            Templates
+          </Button>
+          <Button variant="secondary" onClick={() => navigate('/exercises')}>
+            Exercises
+          </Button>
+        </div>
+
         {loading && (
           <div className="text-center py-12">
             <div className="text-slate-400">Loading your workouts...</div>
@@ -75,7 +88,7 @@ export function HomeScreen() {
           </div>
         )}
 
-        {!loading && weeks.length === 0 && (
+        {!loading && !error && weeks.length === 0 && (
           <div className="text-center py-12">
             <h2 className="text-2xl text-white mb-2">No Workouts Yet</h2>
             <p className="text-slate-400 mb-6">Start logging your training!</p>

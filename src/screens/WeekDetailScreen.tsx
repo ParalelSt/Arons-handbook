@@ -78,12 +78,12 @@ export function WeekDetailScreen() {
         onBack={() => navigate("/")}
         action={
           <Button onClick={() => navigate("/workout/new")}>
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         }
       />
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {loading && (
           <div className="text-center py-12">
             <div className="text-slate-400">Loading week...</div>
@@ -91,7 +91,7 @@ export function WeekDetailScreen() {
         )}
 
         {!loading && (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {weekDays.map((day) => {
               const workout = getWorkoutForDate(day);
               const dayName = format(day, "EEEE");

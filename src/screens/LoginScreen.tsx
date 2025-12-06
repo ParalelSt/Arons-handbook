@@ -33,17 +33,17 @@ export function LoginScreen() {
   }
 
   return (
-    <Container className="flex items-center justify-center p-4">
+    <Container className="flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             Gym LogBook
           </h1>
-          <p className="text-slate-400">Track your training progress</p>
+          <p className="text-sm sm:text-base text-slate-400">Track your training progress</p>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-5 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">
             {isSignUp ? "Create Account" : "Welcome Back"}
           </h2>
 
@@ -77,13 +77,13 @@ export function LoginScreen() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-4 sm:mt-6 text-center">
             <button
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setError("");
               }}
-              className="text-slate-400 hover:text-white transition-colors text-sm"
+              className="text-slate-400 hover:text-white transition-colors text-xs sm:text-sm"
             >
               {isSignUp
                 ? "Already have an account? Sign in"

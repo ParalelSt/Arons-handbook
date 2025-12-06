@@ -23,8 +23,8 @@ export function Input({
   step,
 }: InputProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-slate-300">
+    <div className="flex flex-col gap-1.5 sm:gap-2">
+      <label className="text-xs sm:text-sm font-medium text-slate-300">
         {label}
         {required && <span className="text-red-400 ml-1">*</span>}
       </label>
@@ -37,7 +37,7 @@ export function Input({
         min={min}
         step={step}
         className={cn(
-          "px-4 py-2 rounded-lg",
+          "px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base",
           "bg-slate-900/50 border border-slate-700",
           "text-white placeholder-slate-500",
           "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
@@ -64,15 +64,15 @@ export function TextArea({
   rows = 3,
 }: TextAreaProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-slate-300">{label}</label>
+    <div className="flex flex-col gap-1.5 sm:gap-2">
+      <label className="text-xs sm:text-sm font-medium text-slate-300">{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
         className={cn(
-          "px-4 py-2 rounded-lg",
+          "px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base",
           "bg-slate-900/50 border border-slate-700",
           "text-white placeholder-slate-500",
           "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
@@ -94,14 +94,14 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-slate-800 rounded-2xl border border-slate-700 max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">{title}</h2>
+      <div className="relative bg-slate-800 rounded-t-2xl sm:rounded-2xl border-t sm:border border-slate-700 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-slate-800 border-b border-slate-700 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+          <h2 className="text-lg sm:text-xl font-bold text-white">{title}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
@@ -121,7 +121,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             </svg>
           </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="p-4 sm:p-6 pb-safe">{children}</div>
       </div>
     </div>
   );

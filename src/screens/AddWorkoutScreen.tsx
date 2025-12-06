@@ -117,8 +117,8 @@ export function AddWorkoutScreen() {
     <Container>
       <Header title="New Workout" onBack={() => navigate(-1)} />
 
-      <div className="container mx-auto px-4 py-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Info */}
           <Card className="p-5 space-y-4">
             <Input
