@@ -8,10 +8,12 @@ import { exerciseApi, goalApi } from "@/lib/api";
 import type { Exercise, ExerciseGoal } from "@/types";
 import { Trash2, Save } from "lucide-react";
 
+type GoalDraft = Partial<ExerciseGoal> & { exercise_id: string };
+
 export function GoalsScreen() {
   const navigate = useNavigate();
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [goals, setGoals] = useState<Record<string, ExerciseGoal>>({});
+  const [goals, setGoals] = useState<Record<string, GoalDraft>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [saving, setSaving] = useState(false);
@@ -35,7 +37,7 @@ export function GoalsScreen() {
       setExercises(exs);
 
       // Map goals by exercise_id for easy lookup
-      const goalsMap: Record<string, ExerciseGoal> = {};
+      const goalsMap: Record<string, GoalDraft> = {};
       gls.forEach((goal) => {
         goalsMap[goal.exercise_id] = goal;
       });
@@ -61,10 +63,10 @@ export function GoalsScreen() {
     setGoals((prev) => ({
       ...prev,
       [exerciseId]: {
-        ...prev[exerciseId],
+        ...(prev[exerciseId] ?? { exercise_id: exerciseId }),
         [field === "reps" ? "target_reps" : "target_weight"]: numValue,
         exercise_id: exerciseId,
-      } as ExerciseGoal,
+      },
     }));
 
     setEdited((prev) => new Set([...prev, exerciseId]));
@@ -165,7 +167,10 @@ export function GoalsScreen() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h2 className="text-lg font-semibold text-white">Your Goals</h2>
               <div className="flex gap-2">
-                <Button variant="secondary" onClick={() => setShowAddModal(true)}>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowAddModal(true)}
+                >
                   + Add Goal
                 </Button>
               </div>
@@ -174,14 +179,22 @@ export function GoalsScreen() {
             {Object.keys(goals).length === 0 ? (
               <Card className="p-6 text-center">
                 <p className="text-slate-400 mb-3">No goals yet.</p>
-                <Button onClick={() => setShowAddModal(true)}>Add Your First Goal</Button>
+                <Button onClick={() => setShowAddModal(true)}>
+                  Add Your First Goal
+                </Button>
               </Card>
             ) : (
               <div className="space-y-3 sm:space-y-4">
                 {Object.keys(goals)
-                  .map((id) => ({ id, exercise: exercises.find((e) => e.id === id), goal: goals[id] }))
+                  .map((id) => ({
+                    id,
+                    exercise: exercises.find((e) => e.id === id),
+                    goal: goals[id],
+                  }))
                   .filter((item) => item.exercise)
-                  .sort((a, b) => a.exercise!.name.localeCompare(b.exercise!.name))
+                  .sort((a, b) =>
+                    a.exercise!.name.localeCompare(b.exercise!.name)
+                  )
                   .map(({ id, exercise, goal }) => (
                     <Card key={id} className="p-4 sm:p-5">
                       <div className="flex items-start justify-between mb-4 gap-2">
@@ -200,7 +213,9 @@ export function GoalsScreen() {
                         <Input
                           label="Target Reps"
                           type="number"
-                          value={goal?.target_reps ? String(goal.target_reps) : ""}
+                          value={
+                            goal?.target_reps ? String(goal.target_reps) : ""
+                          }
                           onChange={(v) => updateGoal(id, "reps", v)}
                           placeholder="e.g., 12"
                           min={0}
@@ -208,7 +223,11 @@ export function GoalsScreen() {
                         <Input
                           label="Target Weight (kg)"
                           type="number"
-                          value={goal?.target_weight ? String(goal.target_weight) : ""}
+                          value={
+                            goal?.target_weight
+                              ? String(goal.target_weight)
+                              : ""
+                          }
                           onChange={(v) => updateGoal(id, "weight", v)}
                           placeholder="e.g., 50"
                           min={0}
@@ -261,7 +280,9 @@ export function GoalsScreen() {
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs sm:text-sm font-medium text-slate-300">Search exercises</label>
+                <label className="text-xs sm:text-sm font-medium text-slate-300">
+                  Search exercises
+                </label>
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -273,7 +294,9 @@ export function GoalsScreen() {
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {exercises
                   .filter((ex) => !goals[ex.id])
-                  .filter((ex) => ex.name.toLowerCase().includes(search.toLowerCase()))
+                  .filter((ex) =>
+                    ex.name.toLowerCase().includes(search.toLowerCase())
+                  )
                   .map((exercise) => (
                     <button
                       key={exercise.id}
@@ -292,8 +315,14 @@ export function GoalsScreen() {
                     </button>
                   ))}
 
-                {exercises.filter((ex) => !goals[ex.id]).filter((ex) => ex.name.toLowerCase().includes(search.toLowerCase())).length === 0 && (
-                  <p className="text-slate-500 text-sm text-center py-6">No exercises available.</p>
+                {exercises
+                  .filter((ex) => !goals[ex.id])
+                  .filter((ex) =>
+                    ex.name.toLowerCase().includes(search.toLowerCase())
+                  ).length === 0 && (
+                  <p className="text-slate-500 text-sm text-center py-6">
+                    No exercises available.
+                  </p>
                 )}
               </div>
             </div>
