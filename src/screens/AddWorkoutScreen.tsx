@@ -20,6 +20,7 @@ export function AddWorkoutScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const presetDate = searchParams.get("date");
+  const presetWeekStart = searchParams.get("weekStart");
 
   const [date, setDate] = useState(
     presetDate || format(new Date(), "yyyy-MM-dd")
@@ -165,7 +166,7 @@ export function AddWorkoutScreen() {
       });
       // Clear draft after successful save
       localStorage.removeItem(DRAFT_KEY);
-      navigate("/");
+      navigate(presetWeekStart ? `/week/${presetWeekStart}` : "/");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to save workout");
@@ -184,7 +185,11 @@ export function AddWorkoutScreen() {
     <Container>
       <Header title="New Workout" onBack={() => navigate(-1)} />
       <Breadcrumbs
-        items={[
+        items={presetWeekStart ? [
+          { label: "Home", onClick: () => navigate("/") },
+          { label: `Week`, onClick: () => navigate(`/week/${presetWeekStart}`) },
+          { label: "New Workout" },
+        ] : [
           { label: "Home", onClick: () => navigate("/") },
           { label: "New Workout" },
         ]}
