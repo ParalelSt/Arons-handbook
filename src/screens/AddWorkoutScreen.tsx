@@ -7,7 +7,7 @@ import type { Exercise, CreateWorkoutExerciseInput } from "@/types";
 import { format } from "date-fns";
 import { Plus, X } from "lucide-react";
 
-const DRAFT_KEY = 'workout-draft';
+const DRAFT_KEY = "workout-draft";
 
 export function AddWorkoutScreen() {
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ export function AddWorkoutScreen() {
   const [notes, setNotes] = useState("");
   const [exercises, setExercises] = useState<CreateWorkoutExerciseInput[]>([]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
@@ -109,12 +110,13 @@ export function AddWorkoutScreen() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (exercises.length === 0) {
-      alert("Please add at least one exercise");
+      setError("Please add at least one exercise");
       return;
     }
 
     try {
       setSaving(true);
+      setError("");
       await workoutApi.create({
         date,
         title: title || undefined,
@@ -124,9 +126,9 @@ export function AddWorkoutScreen() {
       // Clear draft after successful save
       localStorage.removeItem(DRAFT_KEY);
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to save workout");
+      setError(err.message || "Failed to save workout");
     } finally {
       setSaving(false);
     }
@@ -143,6 +145,10 @@ export function AddWorkoutScreen() {
       <Header title="New Workout" onBack={() => navigate(-1)} />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        {error && (
+          <ErrorMessage message={error} onDismiss={() => setError("")} />
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Info */}
           <Card className="p-5 space-y-4">

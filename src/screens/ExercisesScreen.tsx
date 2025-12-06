@@ -2,17 +2,22 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Input, Modal } from "@/components/ui/Form";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { exerciseApi } from "@/lib/api";
 import type { Exercise } from "@/types";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Edit2 } from "lucide-react";
 
 export function ExercisesScreen() {
   const navigate = useNavigate();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newExerciseName, setNewExerciseName] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
+  const [editName, setEditName] = useState("");
 
   useEffect(() => {
     loadExercises();
@@ -21,10 +26,12 @@ export function ExercisesScreen() {
   async function loadExercises() {
     try {
       setLoading(true);
+      setError("");
       const data = await exerciseApi.getAll();
       setExercises(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setError(err.message || "Failed to load exercises");
     } finally {
       setLoading(false);
     }
@@ -36,13 +43,14 @@ export function ExercisesScreen() {
 
     try {
       setSaving(true);
+      setError("");
       await exerciseApi.create(newExerciseName.trim());
       setNewExerciseName("");
       setShowAddModal(false);
       loadExercises();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to add exercise");
+      setError(err.message || "Failed to add exercise");
     } finally {
       setSaving(false);
     }
@@ -52,11 +60,36 @@ export function ExercisesScreen() {
     if (!confirm(`Delete "${name}"?`)) return;
 
     try {
+      setError("");
       await exerciseApi.delete(id);
       loadExercises();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to delete exercise");
+      setError(err.message || "Failed to delete exercise");
+    }
+  }
+
+  function handleEditClick(exercise: Exercise) {
+    setEditingExercise(exercise);
+    setEditName(exercise.name);
+  }
+
+  async function handleRename(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingExercise || !editName.trim()) return;
+
+    try {
+      setSaving(true);
+      setError("");
+      await exerciseApi.update(editingExercise.id, editName.trim());
+      setEditingExercise(null);
+      setEditName("");
+      loadExercises();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to rename exercise");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -73,6 +106,10 @@ export function ExercisesScreen() {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        {error && (
+          <ErrorMessage message={error} onDismiss={() => setError("")} />
+        )}
+
         {loading && (
           <div className="text-center py-12">
             <div className="text-slate-400">Loading exercises...</div>
@@ -98,12 +135,20 @@ export function ExercisesScreen() {
                   <span className="text-white font-medium">
                     {exercise.name}
                   </span>
-                  <button
-                    onClick={() => handleDelete(exercise.id, exercise.name)}
-                    className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-400" />
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditClick(exercise)}
+                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4 text-blue-400" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(exercise.id, exercise.name)}
+                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-400" />
+                    </button>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -142,6 +187,42 @@ export function ExercisesScreen() {
               className="flex-1"
             >
               {saving ? "Adding..." : "Add"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!editingExercise}
+        onClose={() => {
+          setEditingExercise(null);
+          setEditName("");
+        }}
+        title="Rename Exercise"
+      >
+        <form onSubmit={handleRename} className="space-y-4">
+          <Input
+            label="Exercise Name"
+            value={editName}
+            onChange={setEditName}
+            placeholder="e.g., Bench Press"
+            required
+          />
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setEditingExercise(null)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={saving || !editName.trim()}
+              className="flex-1"
+            >
+              {saving ? "Saving..." : "Rename"}
             </Button>
           </div>
         </form>

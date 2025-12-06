@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Modal, Input } from "@/components/ui/Form";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { templateApi } from "@/lib/templates";
 import type { WorkoutTemplateWithExercises } from "@/types";
 import { Plus, Copy, Edit, Trash2, Play } from "lucide-react";
@@ -13,6 +14,7 @@ export function TemplatesScreen() {
     []
   );
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
   const [selectedTemplate, setSelectedTemplate] =
     useState<WorkoutTemplateWithExercises | null>(null);
   const [showCopyModal, setShowCopyModal] = useState(false);
@@ -29,10 +31,15 @@ export function TemplatesScreen() {
   async function loadTemplates() {
     try {
       setLoading(true);
+      setError("");
       const data = await templateApi.getAll();
       setTemplates(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setError(
+        err.message ||
+          "Failed to load templates. Make sure you've run the templates migration in Supabase."
+      );
     } finally {
       setLoading(false);
     }
@@ -42,14 +49,15 @@ export function TemplatesScreen() {
     if (!selectedTemplate || !copyName.trim()) return;
 
     try {
+      setError("");
       await templateApi.copy(selectedTemplate.id, copyName.trim());
       setShowCopyModal(false);
       setCopyName("");
       setSelectedTemplate(null);
       loadTemplates();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to copy template");
+      setError(err.message || "Failed to copy template");
     }
   }
 
@@ -57,11 +65,12 @@ export function TemplatesScreen() {
     if (!confirm(`Delete template "${template.name}"?`)) return;
 
     try {
+      setError("");
       await templateApi.delete(template.id);
       loadTemplates();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to delete template");
+      setError(err.message || "Failed to delete template");
     }
   }
 
@@ -69,14 +78,18 @@ export function TemplatesScreen() {
     if (!selectedTemplate) return;
 
     try {
+      setError("");
       const workoutId = await templateApi.createWorkoutFromTemplate(
         selectedTemplate.id,
         workoutDate
       );
       navigate(`/workout/${workoutId}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to create workout from template");
+      setError(
+        err.message ||
+          "Failed to create workout from template. Make sure the templates migration is run in Supabase."
+      );
     }
   }
 
@@ -93,6 +106,10 @@ export function TemplatesScreen() {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        {error && (
+          <ErrorMessage message={error} onDismiss={() => setError("")} />
+        )}
+
         {loading && (
           <div className="text-center py-12">
             <div className="text-slate-400">Loading templates...</div>

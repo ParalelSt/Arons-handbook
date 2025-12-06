@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Input, TextArea, Modal } from "@/components/ui/Form";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { templateApi } from "@/lib/templates";
 import { exerciseApi } from "@/lib/api";
 import type { Exercise, CreateTemplateExerciseInput } from "@/types";
 import { Plus, X } from "lucide-react";
 
-const DRAFT_KEY = 'template-draft';
+const DRAFT_KEY = "template-draft";
 
 export function AddEditTemplateScreen() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export function AddEditTemplateScreen() {
   const [exercises, setExercises] = useState<CreateTemplateExerciseInput[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(isEditing);
+  const [error, setError] = useState<string>("");
 
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
@@ -66,6 +68,7 @@ export function AddEditTemplateScreen() {
 
     try {
       setLoading(true);
+      setError("");
       const template = await templateApi.getById(templateId);
       setName(template.name);
       setDescription(template.description || "");
@@ -78,9 +81,12 @@ export function AddEditTemplateScreen() {
           notes: te.notes || undefined,
         }))
       );
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to load template");
+      setError(
+        err.message ||
+          "Failed to load template. Make sure the templates migration is run in Supabase."
+      );
       navigate("/templates");
     } finally {
       setLoading(false);
@@ -117,12 +123,13 @@ export function AddEditTemplateScreen() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (exercises.length === 0) {
-      alert("Please add at least one exercise");
+      setError("Please add at least one exercise");
       return;
     }
 
     try {
       setSaving(true);
+      setError("");
       if (isEditing && templateId) {
         // Delete and recreate template exercises for simplicity
         await templateApi.update(templateId, {
@@ -130,7 +137,7 @@ export function AddEditTemplateScreen() {
           description: description || undefined,
         });
         // Note: In production, you'd want more sophisticated update logic
-        alert(
+        setError(
           "Template updated! (Note: Exercise updates require deleting and recreating)"
         );
       } else {
@@ -143,9 +150,12 @@ export function AddEditTemplateScreen() {
         localStorage.removeItem(DRAFT_KEY);
       }
       navigate("/templates");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to save template");
+      setError(
+        err.message ||
+          "Failed to save template. Make sure the templates migration is run in Supabase."
+      );
     } finally {
       setSaving(false);
     }
@@ -176,6 +186,10 @@ export function AddEditTemplateScreen() {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        {error && (
+          <ErrorMessage message={error} onDismiss={() => setError("")} />
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <Card className="p-5 space-y-4">
             <Input
