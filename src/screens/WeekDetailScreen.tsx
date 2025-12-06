@@ -10,6 +10,7 @@ import {
   eachDayOfInterval,
   startOfWeek,
   endOfWeek,
+  getISOWeek,
 } from "date-fns";
 import { ChevronRight, Plus } from "lucide-react";
 
@@ -68,9 +69,7 @@ export function WeekDetailScreen() {
   }
 
   const weekDays = getWeekDays();
-  const weekNumber = weekStart
-    ? Math.ceil((parseISO(weekStart).getDate() + 1) / 7)
-    : 0;
+  const weekNumber = weekStart ? getISOWeek(parseISO(weekStart)) : 0;
 
   return (
     <Container>
