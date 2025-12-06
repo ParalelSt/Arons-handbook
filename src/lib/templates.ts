@@ -166,6 +166,7 @@ export const templateApi = {
     title?: string
   ): Promise<string> {
     const template = await this.getById(templateId);
+    console.log("Template data:", template); // Debug log
 
     const workoutInput: CreateWorkoutInput = {
       date,
@@ -176,16 +177,19 @@ export const templateApi = {
         sets: Array(te.target_sets)
           .fill({})
           .map(() => ({
-            reps: te.target_reps || 10,  // Default to 10 reps instead of 0
+            reps: te.target_reps || 10, // Default to 10 reps instead of 0
             weight: te.target_weight || 0,
           })),
         notes: te.notes || undefined,
       })),
     };
 
+    console.log("Creating workout with input:", workoutInput); // Debug log
+
     // Import workoutApi locally to avoid circular dependency
     const { workoutApi } = await import("./api");
     const workout = await workoutApi.create(workoutInput);
+    console.log("Created workout:", workout); // Debug log
     return workout.id;
   },
 };

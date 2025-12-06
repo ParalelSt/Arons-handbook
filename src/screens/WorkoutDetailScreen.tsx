@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { workoutApi } from "@/lib/api";
 import type { WorkoutWithExercises } from "@/types";
 import { format, parseISO } from "date-fns";
@@ -11,6 +12,7 @@ export function WorkoutDetailScreen() {
   const { workoutId } = useParams<{ workoutId: string }>();
   const [workout, setWorkout] = useState<WorkoutWithExercises | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     if (workoutId) {
@@ -20,10 +22,13 @@ export function WorkoutDetailScreen() {
     async function loadWorkout() {
       try {
         setLoading(true);
+        setError("");
         const data = await workoutApi.getById(workoutId!);
+        console.log("Loaded workout:", data); // Debug log
         setWorkout(data);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        setError(err.message || "Failed to load workout");
       } finally {
         setLoading(false);
       }
@@ -34,11 +39,12 @@ export function WorkoutDetailScreen() {
     if (!workoutId || !confirm("Delete this workout?")) return;
 
     try {
+      setError("");
       await workoutApi.delete(workoutId);
-      navigate(-1);
-    } catch (err) {
+      navigate("/", { replace: true });
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to delete workout");
+      setError(err.message || "Failed to delete workout");
     }
   }
 
@@ -84,6 +90,8 @@ export function WorkoutDetailScreen() {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        {error && <ErrorMessage message={error} onDismiss={() => setError("")} />}
+
         {/* Date and notes */}
         <div className="mb-4 sm:mb-6">
           <p className="text-slate-400 text-xs sm:text-sm mb-2">
