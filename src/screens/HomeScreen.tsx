@@ -13,6 +13,15 @@ export function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  async function handleLogout() {
+    try {
+      await auth.signOut();
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  }
+
   useEffect(() => {
     loadWeeks();
   }, []);
