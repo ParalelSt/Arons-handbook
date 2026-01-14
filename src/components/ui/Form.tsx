@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
+import { getTheme } from "@/lib/theme";
 
 interface InputProps {
   label: string;
@@ -22,6 +24,17 @@ export function Input({
   min,
   step,
 }: InputProps) {
+  const { currentTheme } = useTheme();
+  const theme = getTheme(currentTheme);
+
+  // Map theme colors to focus ring colors
+  const focusRingColor =
+    currentTheme === "blue"
+      ? "focus:ring-blue-500"
+      : currentTheme === "red"
+      ? "focus:ring-red-500"
+      : "focus:ring-slate-500";
+
   return (
     <div className="flex flex-col gap-1.5 sm:gap-2">
       <label className="text-xs sm:text-sm font-medium text-slate-300 block">
@@ -40,7 +53,7 @@ export function Input({
           "w-full min-w-0 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base",
           "bg-slate-900/50 border border-slate-700",
           "text-white placeholder-slate-500",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+          `focus:outline-none focus:ring-2 ${focusRingColor} focus:border-transparent`,
           "transition-all"
         )}
       />
