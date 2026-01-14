@@ -39,6 +39,7 @@ export function AddWorkoutScreen() {
   const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(
     null
   );
+  const [loadingPreviousWeek, setLoadingPreviousWeek] = useState(false);
 
   // Load draft on mount
   useEffect(() => {
@@ -98,6 +99,49 @@ export function AddWorkoutScreen() {
       console.error(err);
       setError(err.message || "Failed to create workout from template");
       setLoadingTemplateId(null);
+    }
+  }
+
+  async function loadPreviousWeekData() {
+    if (!title.trim()) {
+      setError(
+        "Please enter a workout title to load last week's data with the same name"
+      );
+      return;
+    }
+
+    try {
+      setLoadingPreviousWeek(true);
+      setError("");
+      const previousWorkout = await workoutApi.getPreviousWeekWorkout(
+        title.trim(),
+        date
+      );
+
+      if (!previousWorkout) {
+        setError("No workout found from last week with the same title");
+        return;
+      }
+
+      // Map previous workout exercises to current format
+      const newExercises: CreateWorkoutExerciseInput[] =
+        previousWorkout.workout_exercises.map((we) => ({
+          exercise_id: we.exercise_id,
+          sets: we.sets
+            ? we.sets.map((set) => ({
+                reps: set.reps,
+                weight: set.weight,
+              }))
+            : [{ reps: 0, weight: 0 }],
+          notes: we.notes || "",
+        }));
+
+      setExercises(newExercises);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to load previous week's data");
+    } finally {
+      setLoadingPreviousWeek(false);
     }
   }
 
@@ -282,6 +326,19 @@ export function AddWorkoutScreen() {
               onChange={setNotes}
               placeholder="Any notes about this workout..."
             />
+            {title && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={loadPreviousWeekData}
+                disabled={loadingPreviousWeek}
+                className="w-full"
+              >
+                {loadingPreviousWeek
+                  ? "Loading last week's data..."
+                  : "Load Last Week's Data"}
+              </Button>
+            )}
           </Card>
 
           {/* Exercises */}

@@ -258,6 +258,62 @@ export const workoutApi = {
 
     if (error) throw error;
   },
+
+  // Get last week's workout with the same title (for copying weights)
+  async getPreviousWeekWorkout(
+    title: string,
+    currentDate: string
+  ): Promise<WorkoutWithExercises | null> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    // Calculate 7 days before the current date
+    const currentDateObj = parseISO(currentDate);
+    const oneWeekBefore = new Date(currentDateObj);
+    oneWeekBefore.setDate(oneWeekBefore.getDate() - 7);
+    const oneWeekBeforeStr = format(oneWeekBefore, "yyyy-MM-dd");
+
+    // Look for a workout with the same title within the previous week
+    const { data, error } = await supabase
+      .from("workouts")
+      .select(
+        `
+        *,
+        workout_exercises (
+          *,
+          exercise:exercises (*),
+          sets (*)
+        )
+      `
+      )
+      .eq("user_id", user.id)
+      .eq("title", title)
+      .gte("date", oneWeekBeforeStr)
+      .lt("date", currentDateObj.toISOString().split("T")[0])
+      .order("date", { ascending: false })
+      .limit(1);
+
+    if (error) throw error;
+    if (!data || data.length === 0) return null;
+
+    // Sort exercises and sets by order_index
+    const workout = data[0];
+    const workoutWithExercises: WorkoutWithExercises = {
+      ...workout,
+      workout_exercises: (workout.workout_exercises || [])
+        .map((we: any) => ({
+          ...we,
+          sets: (we.sets || []).sort(
+            (a: any, b: any) => a.order_index - b.order_index
+          ),
+        }))
+        .sort((a: any, b: any) => a.order_index - b.order_index),
+    };
+
+    return workoutWithExercises;
+  },
 };
 
 /**

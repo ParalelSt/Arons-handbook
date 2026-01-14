@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
-import { getTheme } from "@/lib/theme";
 
 interface InputProps {
   label: string;
@@ -25,7 +24,6 @@ export function Input({
   step,
 }: InputProps) {
   const { currentTheme } = useTheme();
-  const theme = getTheme(currentTheme);
 
   // Map theme colors to focus ring colors
   const focusRingColor =
