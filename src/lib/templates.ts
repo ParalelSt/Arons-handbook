@@ -227,7 +227,6 @@ export const templateApi = {
     title?: string
   ): Promise<string> {
     const template = await this.getById(templateId);
-    console.log("Template data:", template); // Debug log
 
     // Import workoutApi to check for existing workouts
     const { workoutApi } = await import("./api");

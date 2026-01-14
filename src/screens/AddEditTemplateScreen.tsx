@@ -123,7 +123,7 @@ export function AddEditTemplateScreen() {
         setExercises(parsed.exercises || []);
         setHasDraft(false);
       } catch (err) {
-        console.error("Failed to load draft:", err);
+        // Silently fail to load draft
       }
     }
   }

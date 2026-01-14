@@ -35,7 +35,6 @@ export function WorkoutDetailScreen() {
         setLoading(true);
         setError("");
         const data = await workoutApi.getById(workoutId!);
-        console.log("Loaded workout:", data); // Debug log
         setWorkout(data);
       } catch (err: any) {
         console.error(err);
@@ -101,9 +100,15 @@ export function WorkoutDetailScreen() {
         const goals = await goalApi.getAll();
         const achievedGoals: string[] = [];
 
+        // Track which goals have been notified for this workout
+        const notifiedKey = `goals-notified-${workoutId}`;
+        const notifiedGoals = new Set(
+          JSON.parse(localStorage.getItem(notifiedKey) || "[]") as string[]
+        );
+
         data.workout_exercises.forEach((we) => {
           const goal = goals.find((g) => g.exercise_id === we.exercise_id);
-          if (goal && we.sets) {
+          if (goal && we.sets && !notifiedGoals.has(goal.id)) {
             const meetsGoal = we.sets.some((set) => {
               const repsMatch =
                 !goal.target_reps || set.reps >= goal.target_reps;
@@ -114,11 +119,17 @@ export function WorkoutDetailScreen() {
 
             if (meetsGoal && we.exercise?.name) {
               achievedGoals.push(we.exercise.name);
+              notifiedGoals.add(goal.id);
             }
           }
         });
 
+        // Save updated notified goals
         if (achievedGoals.length > 0) {
+          localStorage.setItem(
+            notifiedKey,
+            JSON.stringify(Array.from(notifiedGoals))
+          );
           setGoalToast(`🎉 You hit your goal for ${achievedGoals.join(", ")}!`);
         }
       }

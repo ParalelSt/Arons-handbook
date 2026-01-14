@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "@/lib/auth";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -12,6 +13,50 @@ import { ExercisesScreen } from "@/screens/ExercisesScreen";
 import { TemplatesScreen } from "@/screens/TemplatesScreen";
 import { AddEditTemplateScreen } from "@/screens/AddEditTemplateScreen";
 import { GoalsScreen } from "@/screens/GoalsScreen";
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Error caught by boundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
+          <div className="text-center max-w-sm">
+            <h1 className="text-2xl font-bold text-white mb-4">
+              Something went wrong
+            </h1>
+            <p className="text-slate-400 mb-6">
+              The app encountered an error. Please try refreshing the page.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -36,7 +81,27 @@ function App() {
       setUser(user);
     });
 
-    return () => subscription.unsubscribe();
+    // Handle app visibility changes (tab/phone wake)
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === "visible") {
+        // App is coming back to foreground
+        try {
+          // Refresh auth session
+          const currentUser = await auth.getCurrentUser();
+          setUser(currentUser);
+        } catch (err) {
+          console.error("Session refresh failed:", err);
+          // User will stay logged in if session is still valid
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      subscription.unsubscribe();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   if (loading) {
@@ -48,57 +113,61 @@ function App() {
   }
 
   return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <PWAPrompt />
-        <Routes>
-          <Route
-            path="/login"
-            element={!user ? <LoginScreen /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/"
-            element={user ? <HomeScreen /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/week/:weekStart"
-            element={user ? <WeekDetailScreen /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/workout/new"
-            element={user ? <AddWorkoutScreen /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/workout/:workoutId"
-            element={user ? <WorkoutDetailScreen /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/exercises"
-            element={user ? <ExercisesScreen /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/templates"
-            element={user ? <TemplatesScreen /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/templates/new"
-            element={
-              user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
-            }
-          />
-          <Route
-            path="/templates/:templateId/edit"
-            element={
-              user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
-            }
-          />
-          <Route
-            path="/goals"
-            element={user ? <GoalsScreen /> : <Navigate to="/login" />}
-          />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <BrowserRouter>
+          <PWAPrompt />
+          <Routes>
+            <Route
+              path="/login"
+              element={!user ? <LoginScreen /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/"
+              element={user ? <HomeScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/week/:weekStart"
+              element={user ? <WeekDetailScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/workout/new"
+              element={user ? <AddWorkoutScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/workout/:workoutId"
+              element={
+                user ? <WorkoutDetailScreen /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/exercises"
+              element={user ? <ExercisesScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/templates"
+              element={user ? <TemplatesScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/templates/new"
+              element={
+                user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/templates/:templateId/edit"
+              element={
+                user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/goals"
+              element={user ? <GoalsScreen /> : <Navigate to="/login" />}
+            />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -12,15 +12,20 @@ Your complete gym logbook app following your exact design layout:
 4. **Workout Detail** - Shows exercises with sets, reps, and weights
 5. **Add Workout** - Form to log new workouts with exercises
 6. **Exercises Library** - Manage your exercise database
+7. **Workout Templates** - Save and reuse favorite workout routines
+8. **Exercise Goals** - Set targets for reps and weight per exercise
+9. **Theme Selector** - Choose between Blue, Red, or Slate themes
 
 ### 🎨 Design Features
 
-- Clean, modern dark theme (slate/blue gradient)
+- Clean, modern dark theme with multiple color options (Blue/Red/Slate)
 - Rounded cards with hover effects
 - Mobile-responsive layout
 - Smooth transitions and animations
-- Clear navigation with back buttons
+- Clear navigation with back buttons and breadcrumbs
 - Icon-based actions (Lucide React icons)
+- Progressive Web App (PWA) support with install prompt
+- Works offline with service worker caching
 
 ## 🚀 First-Time Setup
 
@@ -150,52 +155,30 @@ Home (Weeks Overview)
 - Buttons: Rounded-lg (8px)
 - Spacing: Consistent 4-6 units
 
-## 🔑 Key Features
+## � Implemented Features
 
-✅ User authentication (each user has their own data)
-✅ Weekly workout organization
-✅ Exercise library management
-✅ Sets, reps, and weight tracking
-✅ Notes for workouts and exercises
-✅ Responsive mobile design
-✅ Fast, modern UI
-✅ Free hosting on Vercel
-✅ Free database on Supabase
+- ✅ User authentication (each user has their own data)
+- ✅ Weekly workout organization
+- ✅ Exercise library management
+- ✅ Sets, reps, and weight tracking
+- ✅ Notes for workouts and exercises
+- ✅ Responsive mobile design
+- ✅ Fast, modern UI with theme selection
+- ✅ Free hosting on Vercel
+- ✅ Free database on Supabase
+- ✅ **Workout templates** - Save and reuse favorite routines
+- ✅ **Exercise goals** - Track target reps/weight per exercise
+- ✅ **Dark/Light theme toggle** - Blue, Red, or Slate themes
+- ✅ **PWA offline support** - Install as mobile app, works offline
 
-## 💡 Tips
-
-- Add your most common exercises first
-- Use workout titles for quick reference (e.g., "Push Day", "Leg Day")
-- Track progressive overload by viewing past workouts
-- Add notes for form tips or how you felt
-
-## 🐛 Troubleshooting
-
-**Can't log in?**
-
-- Check your email for verification link
-- Make sure you ran the database schema
-
-**Exercises not showing?**
-
-- Add them first via "Exercises" button
-- Make sure you're logged in
-
-**Workouts not saving?**
-
-- Check browser console for errors
-- Verify Supabase credentials in .env
-
-## 📝 Next Features to Add (Later)
+## 📝 Future Features to Add
 
 - Progress charts and statistics
 - Exercise history per exercise
 - Personal records (PRs)
 - Rest timer
-- Workout templates
 - Export data to CSV
-- Dark/Light theme toggle
-- PWA offline support
+- Workout analytics dashboard
 
 ---
 

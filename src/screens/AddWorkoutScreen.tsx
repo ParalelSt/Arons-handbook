@@ -53,7 +53,7 @@ export function AddWorkoutScreen() {
         setNotes(parsed.notes || "");
         setExercises(parsed.exercises || []);
       } catch (err) {
-        console.error("Failed to load draft:", err);
+        // Silently fail to load draft
       }
     }
   }, []);
