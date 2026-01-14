@@ -5,6 +5,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Input } from "@/components/ui/Form";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { Toast } from "@/components/ui/Toast";
 import { exerciseApi, goalApi } from "@/lib/api";
 import type { Exercise, ExerciseGoal } from "@/types";
 import { Trash2, Save } from "lucide-react";
@@ -17,6 +18,7 @@ export function GoalsScreen() {
   const [goals, setGoals] = useState<Record<string, GoalDraft>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [edited, setEdited] = useState<Set<string>>(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
@@ -91,8 +93,7 @@ export function GoalsScreen() {
       await Promise.all(savePromises);
 
       setEdited(new Set());
-      setError("Goals saved successfully!");
-      setTimeout(() => setError(""), 3000);
+      setSuccess("Goals saved successfully!");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to save goals");
@@ -157,6 +158,9 @@ export function GoalsScreen() {
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {error && (
           <ErrorMessage message={error} onDismiss={() => setError("")} />
+        )}
+        {success && (
+          <Toast message={success} onDismiss={() => setSuccess("")} />
         )}
 
         {exercises.length === 0 ? (
