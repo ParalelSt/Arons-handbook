@@ -4,13 +4,16 @@ A React + TypeScript + Supabase application for tracking gym exercises and worko
 
 ## Features
 
-- ��� Track exercises with sets, reps, and weight
-- ��� View workouts organized by week
-- ��� Cloud data storage with Supabase
-- ��� Secure user authentication
-- ��� Modern UI with Tailwind CSS
-- ��� Mobile-friendly responsive design
-- ��� Deployable to Vercel (free hosting!)
+- 🏋️ Track exercises with sets, reps, and weight
+- 📅 View workouts organized by week
+- 🎯 Set and track exercise goals
+- 📋 Create reusable workout templates
+- 🔄 Copy last week's weights for easy progressive overload
+- ☁️ Cloud data storage with Supabase
+- 🔐 Secure user authentication
+- 🎨 Multiple color themes (Blue, Red, Slate)
+- 📱 Mobile-friendly responsive design
+- 💾 PWA support - install on your phone!
 
 ## Tech Stack
 
@@ -21,24 +24,6 @@ A React + TypeScript + Supabase application for tracking gym exercises and worko
 - **Supabase** - Backend & database (PostgreSQL)
 - **Vercel** - Hosting platform
 - **date-fns** - Date utilities
-
-## Project Structure
-
-```
-src/
-  ├── lib/
-  │   ├── api.ts        # Supabase API functions (workouts, exercises)
-  │   ├── auth.ts       # Authentication utilities
-  │   ├── supabase.ts   # Supabase client configuration
-  │   ├── storage.ts    # localStorage utilities (fallback)
-  │   └── utils.ts      # Helper functions (cn for classnames)
-  ├── types/
-  │   └── index.ts      # TypeScript type definitions
-  ├── App.tsx           # Main app component
-  └── main.tsx          # Entry point
-supabase/
-  └── schema.sql        # Database schema & RLS policies
-```
 
 ## Quick Start
 
@@ -53,6 +38,7 @@ npm install
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for full setup instructions.
 
 Quick version:
+
 1. Create account at [supabase.com](https://supabase.com)
 2. Create new project
 3. Run `supabase/schema.sql` in SQL Editor
@@ -65,6 +51,7 @@ cp .env.example .env
 ```
 
 Edit `.env` and add your Supabase credentials:
+
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
@@ -83,6 +70,7 @@ Visit http://localhost:5173
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide to Vercel.
 
 **TLDR:**
+
 1. Push to GitHub
 2. Import to Vercel
 3. Add environment variables
@@ -120,98 +108,21 @@ sets
   ├── reps (integer)
   ├── weight (numeric)
   └── order_index (integer)
-```
 
-## API Usage Examples
+exercise_goals
+  ├── id (uuid)
+  ├── user_id (references auth.users)
+  ├── exercise_id (references exercises)
+  ├── target_reps (integer, optional)
+  ├── target_weight (numeric, optional)
+  └── created_at (timestamp)
 
-### Authentication
-
-```typescript
-import { auth } from '@/lib/auth';
-
-// Sign up
-await auth.signUp('email@example.com', 'password');
-
-// Sign in
-await auth.signIn('email@example.com', 'password');
-
-// Sign out
-await auth.signOut();
-
-// Get current user
-const user = await auth.getCurrentUser();
-```
-
-### Managing Exercises
-
-```typescript
-import { exerciseApi } from '@/lib/api';
-
-// Get all exercises
-const exercises = await exerciseApi.getAll();
-
-// Create exercise
-const exercise = await exerciseApi.create('Bench Press');
-
-// Update exercise
-await exerciseApi.update(exerciseId, 'Incline Bench Press');
-
-// Delete exercise
-await exerciseApi.delete(exerciseId);
-```
-
-### Managing Workouts
-
-```typescript
-import { workoutApi } from '@/lib/api';
-
-// Get workouts grouped by week
-const weeks = await workoutApi.getByWeeks();
-
-// Create a workout
-await workoutApi.create({
-  date: '2025-12-06',
-  title: 'Push Day',
-  exercises: [
-    {
-      exercise_id: 'bench-press-id',
-      sets: [
-        { reps: 10, weight: 135 },
-        { reps: 8, weight: 155 },
-        { reps: 6, weight: 175 }
-      ]
-    }
-  ]
-});
-
-// Get specific workout
-const workout = await workoutApi.getById(workoutId);
-
-// Delete workout
-await workoutApi.delete(workoutId);
-```
-
-## Utilities
-
-### Class Name Merger
-
-```typescript
-import { cn } from '@/lib/utils';
-
-<div className={cn(
-  "base-class",
-  isActive && "active-class",
-  "hover:bg-blue-500"
-)} />
-```
-
-### Date Utilities
-
-```typescript
-import { format, startOfWeek, endOfWeek } from 'date-fns';
-
-const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Monday
-const formatted = format(new Date(), 'yyyy-MM-dd');
+workout_templates
+  ├── id (uuid)
+  ├── user_id (references auth.users)
+  ├── name (text)
+  ├── description (text, optional)
+  └── created_at (timestamp)
 ```
 
 ## Security
@@ -221,32 +132,18 @@ const formatted = format(new Date(), 'yyyy-MM-dd');
 - Secure authentication with Supabase Auth
 - API keys stored in environment variables (never in code)
 
-## Free Tier Limits
+## Roadmap
 
-**Supabase:**
-- 500 MB database
-- 2 GB bandwidth/month
-- Unlimited API requests
-- Perfect for personal use!
+Future improvements:
 
-**Vercel:**
-- 100 GB bandwidth/month
-- Unlimited deployments
-- Free SSL certificates
-
-## Next Steps
-
-1. Build authentication UI (login/signup)
-2. Create exercise management page
-3. Add workout logging form
-4. Build weekly workout view
-5. Create individual workout detail view
-6. Add progress charts and statistics
-7. Add PWA support for offline access
+- 📊 Progress charts and statistics
+- 🏆 Personal Records (PRs) tracking
+- 📤 Export workout history
+- 🔔 Workout reminders
 
 ## Contributing
 
-Feel free to fork and customize for your own use!
+Feel free to fork and customize for your own use! This project is open source and contributions are welcome.
 
 ## License
 

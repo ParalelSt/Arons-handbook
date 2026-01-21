@@ -30,8 +30,8 @@ export function Input({
     currentTheme === "blue"
       ? "focus:ring-blue-500"
       : currentTheme === "red"
-      ? "focus:ring-red-500"
-      : "focus:ring-slate-500";
+        ? "focus:ring-red-500"
+        : "focus:ring-slate-500";
 
   return (
     <div className="flex flex-col gap-1.5 sm:gap-2">
@@ -52,7 +52,8 @@ export function Input({
           "bg-slate-900/50 border border-slate-700",
           "text-white placeholder-slate-500",
           `focus:outline-none focus:ring-2 ${focusRingColor} focus:border-transparent`,
-          "transition-all"
+          "invalid:ring-0 invalid:border-slate-700",
+          "transition-all",
         )}
       />
     </div>
@@ -89,7 +90,7 @@ export function TextArea({
           "bg-slate-900/50 border border-slate-700",
           "text-white placeholder-slate-500",
           "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-          "transition-all resize-none"
+          "transition-all resize-none",
         )}
       />
     </div>
