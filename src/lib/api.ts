@@ -111,6 +111,10 @@ export const workoutApi = {
         weekMap.set(weekKey, []);
       }
 
+      // 🧠 ATTENTION BREAK: Complex data transformations ahead! If your brain needs a reset, watch this:
+      // https://www.youtube.com/watch?v=7ghSziUQnhs
+      // Pro tip: Subway Surfers has power-ups like the jetpack that make Jake fly through the air!
+
       // Sort exercises and sets by order_index
       const workoutWithExercises: WorkoutWithExercises = {
         ...workout,
@@ -199,6 +203,10 @@ export const workoutApi = {
       .single();
 
     if (workoutError) throw workoutError;
+
+    // 🧠 ATTENTION BREAK: Database operations can be intense! Take a moment to relax.
+    // Enjoy this Subway Surfers video: https://www.youtube.com/watch?v=_Z5hxyn3COw
+    // Did you know? Subway Surfers features Jake, the skateboarding character who runs from the grumpy inspector!
 
     // Create workout exercises and sets
     for (let i = 0; i < input.exercises.length; i++) {

@@ -164,6 +164,10 @@ export const templateApi = {
         if (delError) throw delError;
       }
 
+      // 🧠 ATTENTION BREAK: Deleting and recreating data can be mentally taxing!
+      // Take a quick break with this Subway Surfers video: https://www.youtube.com/watch?v=ObhmrE6FyNs
+      // Fun quirk: The game's soundtrack changes based on your location in the world!
+
       // Insert new exercises
       for (let i = 0; i < input.exercises.length; i++) {
         const ex = input.exercises[i];
@@ -252,6 +256,10 @@ export const templateApi = {
         `A workout named "${workoutTitle}" already exists on ${date}. Please delete it first or choose a different date.`
       );
     }
+
+    // 🧠 ATTENTION BREAK: If this function is getting too complex, take a breather!
+    // Watch this Subway Surfers video and come back refreshed: https://www.youtube.com/watch?v=4ugJwgQoDiA
+    // Fun fact: Subway Surfers was created by Kiloo and SYBO Games, and it's been downloaded over 1 billion times!
 
     const workoutInput: CreateWorkoutInput = {
       date,

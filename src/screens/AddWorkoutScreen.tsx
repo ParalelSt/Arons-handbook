@@ -304,6 +304,24 @@ export function AddWorkoutScreen() {
           </div>
         )}
 
+        {/* Attention Break for Attention Deficient Users */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/30 rounded-lg">
+          <h3 className="text-sm font-semibold text-purple-300 mb-2">
+            🧠 Attention Break
+          </h3>
+          <p className="text-xs text-slate-300 mb-3">
+            If this form feels overwhelming, take a quick break! Watch this fun Subway Surfers video to recharge:
+          </p>
+          <a
+            href="https://www.youtube.com/watch?v=vTfD20dbxho"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-lg transition-colors"
+          >
+            🎮 Play Subway Surfers
+          </a>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Info */}
           <Card className="p-5 space-y-4">
