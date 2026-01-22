@@ -244,6 +244,24 @@ export function WorkoutDetailScreen() {
           )}
         </div>
 
+        {/* Attention Break for Attention Deficient Users */}
+        <div className="mb-4 sm:mb-6 p-4 bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30 rounded-lg">
+          <h3 className="text-sm font-semibold text-orange-300 mb-2">
+            🧠 Attention Break
+          </h3>
+          <p className="text-xs text-slate-300 mb-3">
+            Reviewing workout details can be data-intensive. If you need a breather, check out this Subway Surfers video:
+          </p>
+          <a
+            href="https://www.youtube.com/watch?v=_Z5hxyn3COw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs rounded-lg transition-colors"
+          >
+            🎮 Play Subway Surfers
+          </a>
+        </div>
+
         {/* Exercises list */}
         <div className="space-y-3 sm:space-y-4">
           {workout.workout_exercises.length === 0 ? (

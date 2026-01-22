@@ -107,6 +107,10 @@ interface ModalProps {
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
+  // 🧠 ATTENTION BREAK: Modal rendering can be complex with z-index and positioning!
+  // Take a quick break with this Subway Surfers video: https://www.youtube.com/watch?v=7ghSziUQnhs
+  // Fun fact: Subway Surfers has been played by over 2 billion people worldwide!
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4">
       <div

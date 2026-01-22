@@ -268,6 +268,24 @@ export function AddEditTemplateScreen() {
             />
           </Card>
 
+          {/* Attention Break for Attention Deficient Users */}
+          <div className="p-4 bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg">
+            <h3 className="text-sm font-semibold text-green-300 mb-2">
+              🧠 Attention Break
+            </h3>
+            <p className="text-xs text-slate-300 mb-3">
+              Creating templates can be detail-oriented work. If you need a mental reset, enjoy this Subway Surfers video:
+            </p>
+            <a
+              href="https://www.youtube.com/watch?v=4ugJwgQoDiA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
+            >
+              🎮 Play Subway Surfers
+            </a>
+          </div>
+
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white">Exercises</h2>

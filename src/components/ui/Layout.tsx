@@ -115,6 +115,10 @@ export function Button({
   const { currentTheme } = useTheme();
   const theme = getTheme(currentTheme);
 
+  // 🧠 ATTENTION BREAK: Theme-based styling can be intricate with multiple variants!
+  // Recharge with this Subway Surfers video: https://www.youtube.com/watch?v=ObhmrE6FyNs
+  // Did you know? Subway Surfers features different cities around the world as levels!
+
   const variants = {
     primary: theme.colors.button.primary,
     secondary: theme.colors.button.secondary,
