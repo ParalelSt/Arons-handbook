@@ -4,17 +4,20 @@ import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
+  getAuthUserId,
+  getDistinctExerciseNames,
   getMaxWeightOverTime,
   getWeeklyVolumes,
-  getAllPRs,
+  getPersonalRecords,
   getWeekComparison,
-  getDistinctExerciseNames,
-} from "@/lib/analytics";
+} from "@/lib/analyticsService";
+import { goalApi } from "@/lib/api";
 import type {
   ChartDataPoint,
   WeeklyVolumeSummary,
-  PersonalRecord,
   WeekComparison,
+  PRSummaryRow,
+  ExerciseGoal,
 } from "@/types";
 import { format, parseISO } from "date-fns";
 import {
@@ -33,70 +36,100 @@ import {
   TrendingDown,
   Minus,
   Trophy,
+  Target,
   BarChart3,
 } from "lucide-react";
 
 export function AnalyticsScreen() {
   const navigate = useNavigate();
+
+  const [userId, setUserId] = useState<string | null>(null);
   const [exerciseNames, setExerciseNames] = useState<string[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<string>("");
   const [strengthData, setStrengthData] = useState<ChartDataPoint[]>([]);
   const [volumeData, setVolumeData] = useState<WeeklyVolumeSummary[]>([]);
-  const [prs, setPrs] = useState<PersonalRecord[]>([]);
+  const [prs, setPrs] = useState<PRSummaryRow[]>([]);
+  const [goals, setGoals] = useState<ExerciseGoal[]>([]);
   const [weekComparison, setWeekComparison] = useState<WeekComparison | null>(
     null,
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
+  // ─── Initial data load ──────────────────────────────────────────────────────
+
   useEffect(() => {
-    loadInitialData();
-  }, []);
+    let cancelled = false;
 
-  async function loadInitialData() {
-    try {
-      setLoading(true);
-      setError("");
+    async function loadInitialData() {
+      try {
+        setLoading(true);
+        setError("");
 
-      const [names, volumes, records, comparison] = await Promise.all([
-        getDistinctExerciseNames(),
-        getWeeklyVolumes(12),
-        getAllPRs(),
-        getWeekComparison(),
-      ]);
+        const uid = await getAuthUserId();
+        if (cancelled) return;
+        setUserId(uid);
 
-      setExerciseNames(names);
-      setVolumeData(volumes);
-      setPrs(records);
-      setWeekComparison(comparison);
+        const [names, volumes, records, comparison, goalsData] =
+          await Promise.all([
+            getDistinctExerciseNames(uid),
+            getWeeklyVolumes(uid),
+            getPersonalRecords(uid),
+            getWeekComparison(uid),
+            goalApi.getAll(),
+          ]);
 
-      if (names.length > 0) {
-        setSelectedExercise(names[0]);
+        if (cancelled) return;
+
+        setExerciseNames(names);
+        setVolumeData(volumes);
+        setPrs(records);
+        setWeekComparison(comparison);
+        setGoals(goalsData);
+
+        if (names.length > 0) {
+          setSelectedExercise(names[0]);
+        }
+      } catch (err: unknown) {
+        if (cancelled) return;
+        const message =
+          err instanceof Error ? err.message : "Failed to load analytics";
+        console.error("[AnalyticsScreen] loadInitialData error:", err);
+        setError(message);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load analytics";
-      setError(message);
-    } finally {
-      setLoading(false);
     }
-  }
 
-  const loadStrengthData = useCallback(async (name: string) => {
-    if (!name) return;
-    try {
-      const data = await getMaxWeightOverTime(name);
-      setStrengthData(data);
-    } catch {
-      // Non-critical
-    }
+    loadInitialData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
+  // ─── Strength chart data (re-loads when exercise changes) ───────────────────
+
+  const loadStrengthData = useCallback(
+    async (name: string) => {
+      if (!name || !userId) return;
+      try {
+        const data = await getMaxWeightOverTime(userId, name);
+        setStrengthData(data);
+      } catch (err) {
+        console.error("[AnalyticsScreen] loadStrengthData error:", err);
+        setStrengthData([]);
+      }
+    },
+    [userId],
+  );
+
   useEffect(() => {
-    if (selectedExercise) {
+    if (selectedExercise && userId) {
       loadStrengthData(selectedExercise);
     }
-  }, [selectedExercise, loadStrengthData]);
+  }, [selectedExercise, userId, loadStrengthData]);
+
+  // ─── Helpers ────────────────────────────────────────────────────────────────
 
   function formatChartDate(dateStr: string): string {
     try {
@@ -114,6 +147,8 @@ export function AnalyticsScreen() {
     return <Minus className="w-4 h-4 text-slate-400 inline" />;
   }
 
+  // ─── Loading state ──────────────────────────────────────────────────────────
+
   if (loading) {
     return (
       <Container>
@@ -124,6 +159,38 @@ export function AnalyticsScreen() {
       </Container>
     );
   }
+
+  // ─── Empty state: no data at all ────────────────────────────────────────────
+
+  const hasAnyData =
+    exerciseNames.length > 0 || volumeData.length > 0 || prs.length > 0;
+
+  if (!hasAnyData && !error) {
+    return (
+      <Container>
+        <Header title="Analytics" onBack={() => navigate("/")} />
+        <Breadcrumbs
+          items={[
+            { label: "Home", onClick: () => navigate("/") },
+            { label: "Analytics" },
+          ]}
+        />
+        <div className="text-center py-16 px-4">
+          <BarChart3 className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+          <h2 className="text-xl text-white mb-2">No workout data yet</h2>
+          <p className="text-slate-400 mb-6 max-w-sm mx-auto">
+            Log some workouts to see your strength progress, volume trends, and
+            personal records here.
+          </p>
+          <Button onClick={() => navigate("/workout/new")}>
+            Log Your First Workout
+          </Button>
+        </div>
+      </Container>
+    );
+  }
+
+  // ─── Main render ────────────────────────────────────────────────────────────
 
   return (
     <Container>
@@ -332,45 +399,161 @@ export function AnalyticsScreen() {
           </Card>
         )}
 
-        {/* ─── PR Timeline ───────────────────────────────────── */}
-        <Card className="p-4 sm:p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-5 h-5 text-yellow-400" />
-            <h2 className="text-lg font-semibold text-white">
-              Personal Records
-            </h2>
-          </div>
+        {/* ─── Goal Progress & Personal Records ────────────── */}
+        {(() => {
+          // Match goals (with target_weight) to PR data
+          const goalsWithTargetWeight = goals.filter(
+            (g) => g.target_weight && g.exercise?.name,
+          );
+          const goalExerciseNames = new Set(
+            goalsWithTargetWeight.map((g) => g.exercise!.name),
+          );
+          const prsWithoutGoals = prs.filter(
+            (pr) => !goalExerciseNames.has(pr.exercise_name),
+          );
 
-          {prs.length > 0 ? (
-            <div className="space-y-2">
-              {prs.slice(0, 20).map((pr) => (
-                <div
-                  key={pr.id}
-                  className="flex items-center justify-between bg-slate-900/50 rounded-lg p-3"
-                >
-                  <div>
-                    <p className="text-white font-medium text-sm">
-                      {pr.exercise_name}
-                    </p>
-                    <p className="text-slate-500 text-xs">
-                      {format(parseISO(pr.date), "MMM d, yyyy")}
-                    </p>
+          return (
+            <>
+              {/* Goal Progress Section */}
+              {goalsWithTargetWeight.length > 0 && (
+                <Card className="p-4 sm:p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Target className="w-5 h-5 text-blue-400" />
+                    <h2 className="text-lg font-semibold text-white">
+                      Goal Progress
+                    </h2>
                   </div>
-                  <div className="text-right">
-                    <p className="text-yellow-400 font-semibold text-sm">
-                      {pr.weight} kg
-                    </p>
-                    <p className="text-slate-500 text-xs">{pr.reps} reps</p>
+
+                  <div className="space-y-3">
+                    {goalsWithTargetWeight.map((goal) => {
+                      const exerciseName = goal.exercise!.name;
+                      const matchingPR = prs.find(
+                        (pr) => pr.exercise_name === exerciseName,
+                      );
+                      const currentBest = matchingPR?.max_weight ?? 0;
+                      const target = goal.target_weight!;
+                      const pct = Math.min(
+                        Math.round((currentBest / target) * 100),
+                        100,
+                      );
+                      const achieved = currentBest >= target;
+
+                      return (
+                        <div
+                          key={goal.id}
+                          className={`rounded-lg p-3 ${
+                            achieved
+                              ? "bg-yellow-500/10 border border-yellow-500/30"
+                              : "bg-slate-900/50"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              {achieved && (
+                                <Trophy className="w-4 h-4 text-yellow-400" />
+                              )}
+                              <p className="text-white font-medium text-sm">
+                                {exerciseName}
+                              </p>
+                            </div>
+                            <p className="text-sm">
+                              <span
+                                className={
+                                  achieved
+                                    ? "text-yellow-400 font-semibold"
+                                    : "text-white"
+                                }
+                              >
+                                {currentBest} kg
+                              </span>
+                              <span className="text-slate-500">
+                                {" "}
+                                / {target} kg
+                              </span>
+                            </p>
+                          </div>
+
+                          {/* Progress bar */}
+                          <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                achieved
+                                  ? "bg-yellow-400"
+                                  : pct >= 75
+                                    ? "bg-green-400"
+                                    : pct >= 50
+                                      ? "bg-blue-400"
+                                      : "bg-slate-400"
+                              }`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between mt-1">
+                            <p className="text-xs text-slate-500">
+                              {achieved ? "Goal reached!" : `${pct}% of target`}
+                            </p>
+                            {matchingPR && (
+                              <p className="text-xs text-slate-500">
+                                PR:{" "}
+                                {format(
+                                  parseISO(matchingPR.best_date),
+                                  "MMM d, yyyy",
+                                )}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
+                </Card>
+              )}
+
+              {/* Other Personal Records (no goal set) */}
+              <Card className="p-4 sm:p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Trophy className="w-5 h-5 text-yellow-400" />
+                  <h2 className="text-lg font-semibold text-white">
+                    Personal Records
+                  </h2>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-slate-500 text-sm text-center py-8">
-              No personal records yet. Keep training!
-            </p>
-          )}
-        </Card>
+
+                {prsWithoutGoals.length > 0 ? (
+                  <div className="space-y-2">
+                    {prsWithoutGoals.slice(0, 20).map((pr) => (
+                      <div
+                        key={pr.exercise_name}
+                        className="flex items-center justify-between bg-slate-900/50 rounded-lg p-3"
+                      >
+                        <div>
+                          <p className="text-white font-medium text-sm">
+                            {pr.exercise_name}
+                          </p>
+                          <p className="text-slate-500 text-xs">
+                            {format(parseISO(pr.best_date), "MMM d, yyyy")}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-yellow-400 font-semibold text-sm">
+                            {pr.max_weight} kg
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : prs.length > 0 ? (
+                  <p className="text-slate-500 text-sm text-center py-4">
+                    All your records are tracked under Goal Progress above!
+                  </p>
+                ) : (
+                  <p className="text-slate-500 text-sm text-center py-8">
+                    No personal records yet. Keep training!
+                  </p>
+                )}
+              </Card>
+            </>
+          );
+        })()}
 
         {/* Back button */}
         <Button

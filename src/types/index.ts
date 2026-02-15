@@ -170,3 +170,115 @@ export interface WeekComparison {
   setsChange: number;
   exercisesChange: number;
 }
+
+// ─── RPC Return Types ─────────────────────────────────────────────────────────
+
+export interface PRSummaryRow {
+  exercise_name: string;
+  max_weight: number;
+  best_date: string;
+}
+
+// ─── Week Template Types ──────────────────────────────────────────────────────
+
+export interface WeekTemplate {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface DayTemplate {
+  id: string;
+  template_id: string;
+  name: string;
+}
+
+export interface ExerciseTemplate {
+  id: string;
+  day_template_id: string;
+  name: string;
+}
+
+export interface TemplateSet {
+  id: string;
+  exercise_template_id: string;
+  reps: number;
+  weight: number;
+}
+
+export interface ExerciseTemplateWithSets extends ExerciseTemplate {
+  template_sets: TemplateSet[];
+}
+
+export interface DayTemplateWithExercises extends DayTemplate {
+  exercise_templates: ExerciseTemplateWithSets[];
+}
+
+export interface WeekTemplateWithDays extends WeekTemplate {
+  day_templates: DayTemplateWithExercises[];
+}
+
+// ─── Week Template Form Types ─────────────────────────────────────────────────
+
+export interface SaveSetInput {
+  reps: number;
+  weight: number;
+}
+
+export interface SaveExerciseInput {
+  name: string;
+  sets: SaveSetInput[];
+}
+
+export interface SaveDayInput {
+  name: string;
+  exercises: SaveExerciseInput[];
+}
+
+// ─── Exercise Library Types ───────────────────────────────────────────────────
+
+export interface ExerciseLibraryItem {
+  id: string;
+  user_id: string;
+  name: string;
+  muscle_group: string | null;
+  default_reps: number;
+  default_weight: number;
+  usage_count: number;
+  last_used_at: string | null;
+  created_at: string;
+}
+
+export type ExerciseLibrarySortMode =
+  | "recent"
+  | "frequent"
+  | "alpha"
+  | "muscle"
+  | "created";
+
+// ─── Day Library Types ────────────────────────────────────────────────────────
+
+export interface DayLibrarySet {
+  id: string;
+  day_library_exercise_id: string;
+  reps: number;
+  weight: number;
+}
+
+export interface DayLibraryExercise {
+  id: string;
+  day_library_id: string;
+  name: string;
+  muscle_group: string | null;
+  order_index: number;
+  day_library_sets: DayLibrarySet[];
+}
+
+export interface DayLibraryItem {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  day_library_exercises: DayLibraryExercise[];
+}
