@@ -24,6 +24,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { format, startOfWeek } from "date-fns";
+import { supabase } from "@/lib/supabase";
 
 type Tab = "workout" | "weekly";
 
@@ -213,11 +214,36 @@ export function TemplatesScreen() {
     if (!weekGenerateTarget) return;
     try {
       setGeneratingWeek(true);
-      const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
-      const ids = await generateWeekFromTemplate(weekGenerateTarget.id, monday);
+      // Find last workout date
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      const { data, error } = await supabase
+        .from("workouts")
+        .select("date")
+        .eq("user_id", user.id)
+        .order("date", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      let weekStartDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+      if (data && data.length > 0 && data[0].date) {
+        const lastWorkoutDate = new Date(data[0].date);
+        const lastWeekStart = startOfWeek(lastWorkoutDate, { weekStartsOn: 1 });
+        const thisWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+        // If last workout is in this week, generate for next week
+        if (lastWeekStart.getTime() === thisWeekStart.getTime()) {
+          weekStartDate = new Date(thisWeekStart);
+          weekStartDate.setDate(weekStartDate.getDate() + 7); // Next Monday
+        }
+      }
+      const ids = await generateWeekFromTemplate(
+        weekGenerateTarget.id,
+        weekStartDate,
+      );
       setWeekGenerateTarget(null);
       setToast(
-        `Created ${ids.length} workout${ids.length !== 1 ? "s" : ""} for the week of ${format(monday, "MMM d")}`,
+        `Created ${ids.length} workout${ids.length !== 1 ? "s" : ""} for the week of ${format(weekStartDate, "MMM d")}`,
       );
     } catch (err: unknown) {
       const msg =
