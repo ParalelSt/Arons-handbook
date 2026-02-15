@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { getLastUsedWeight } from "@/lib/analytics";
 import type {
   WorkoutTemplate,
   WorkoutTemplateWithExercises,
@@ -27,7 +28,7 @@ export const templateApi = {
           *,
           exercise:exercises (*)
         )
-      `
+      `,
       )
       .eq("user_id", user.id)
       .order("name", { ascending: true });
@@ -53,7 +54,7 @@ export const templateApi = {
           *,
           exercise:exercises (*)
         )
-      `
+      `,
       )
       .eq("id", id)
       .single();
@@ -63,14 +64,14 @@ export const templateApi = {
     return {
       ...data,
       template_exercises: (data.template_exercises || []).sort(
-        (a: any, b: any) => a.order_index - b.order_index
+        (a: any, b: any) => a.order_index - b.order_index,
       ),
     };
   },
 
   // Create template
   async create(
-    input: CreateTemplateInput
+    input: CreateTemplateInput,
   ): Promise<WorkoutTemplateWithExercises> {
     const {
       data: { user },
@@ -117,7 +118,7 @@ export const templateApi = {
   // Update template
   async update(
     id: string,
-    input: Partial<WorkoutTemplate>
+    input: Partial<WorkoutTemplate>,
   ): Promise<WorkoutTemplateWithExercises> {
     const { error } = await supabase
       .from("workout_templates")
@@ -133,7 +134,7 @@ export const templateApi = {
     id: string,
     input: Partial<WorkoutTemplate> & {
       exercises?: CreateTemplateExerciseInput[];
-    }
+    },
   ): Promise<WorkoutTemplateWithExercises> {
     // Update template metadata
     const { error: metaError } = await supabase
@@ -201,7 +202,7 @@ export const templateApi = {
   // Copy template (create duplicate)
   async copy(
     templateId: string,
-    newName: string
+    newName: string,
   ): Promise<WorkoutTemplateWithExercises> {
     const original = await this.getById(templateId);
 
@@ -224,7 +225,7 @@ export const templateApi = {
   async createWorkoutFromTemplate(
     templateId: string,
     date: string,
-    title?: string
+    title?: string,
   ): Promise<string> {
     const template = await this.getById(templateId);
 
@@ -249,7 +250,7 @@ export const templateApi = {
 
     if (existingWorkouts && existingWorkouts.length > 0) {
       throw new Error(
-        `A workout named "${workoutTitle}" already exists on ${date}. Please delete it first or choose a different date.`
+        `A workout named "${workoutTitle}" already exists on ${date}. Please delete it first or choose a different date.`,
       );
     }
 
@@ -257,17 +258,33 @@ export const templateApi = {
       date,
       title: workoutTitle,
       notes: template.description || undefined,
-      exercises: template.template_exercises.map((te) => ({
-        exercise_id: te.exercise_id,
-        // Ensure sets pass DB checks (reps > 0). Default to at least one set and rep if missing.
-        sets: Array(Math.max(1, te.target_sets || 1))
-          .fill({})
-          .map(() => ({
-            reps: te.target_reps && te.target_reps > 0 ? te.target_reps : 1,
-            weight: te.target_weight ?? 0,
-          })),
-        notes: te.notes || undefined,
-      })),
+      exercises: await Promise.all(
+        template.template_exercises.map(async (te) => {
+          // Weight carry-over: try last used weight, fall back to template default
+          let weight = te.target_weight ?? 0;
+          if (te.exercise?.name) {
+            try {
+              const lastWeight = await getLastUsedWeight(te.exercise.name);
+              if (lastWeight !== null) {
+                weight = lastWeight;
+              }
+            } catch {
+              // Fall back to template default on error
+            }
+          }
+
+          return {
+            exercise_id: te.exercise_id,
+            sets: Array(Math.max(1, te.target_sets || 1))
+              .fill(null)
+              .map(() => ({
+                reps: te.target_reps && te.target_reps > 0 ? te.target_reps : 1,
+                weight,
+              })),
+            notes: te.notes || undefined,
+          };
+        }),
+      ),
     };
 
     console.log("Creating workout with input:", workoutInput); // Debug log

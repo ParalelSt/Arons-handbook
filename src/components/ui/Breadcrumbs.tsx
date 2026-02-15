@@ -21,7 +21,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
         "px-3 sm:px-4 py-2 bg-slate-900/60 border-b border-slate-700",
         "overflow-x-auto whitespace-nowrap text-xs sm:text-sm text-slate-300",
         "flex items-center gap-1",
-        className
+        className,
       )}
       aria-label="Breadcrumb"
     >
@@ -35,7 +35,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                 onClick={item.onClick}
                 className={cn(
                   "hover:text-white transition-colors",
-                  isLast && "font-semibold text-white"
+                  isLast && "font-semibold text-white",
                 )}
               >
                 {item.label}

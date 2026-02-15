@@ -126,3 +126,47 @@ export interface CreateTemplateInput {
   description?: string;
   exercises: CreateTemplateExerciseInput[];
 }
+
+// Personal Records
+export interface PersonalRecord {
+  id: string;
+  user_id: string;
+  exercise_name: string;
+  weight: number;
+  reps: number;
+  date: string;
+  created_at: string;
+}
+
+// Exercise Progress Comparison
+export interface ExerciseComparison {
+  exerciseName: string;
+  previousWeight: number;
+  previousReps: number;
+  previousDate: string;
+  previousWeekDay: string;
+  trend: "up" | "down" | "same";
+}
+
+// Analytics chart data point
+export interface ChartDataPoint {
+  date: string;
+  value: number;
+}
+
+// Weekly volume summary
+export interface WeeklyVolumeSummary {
+  weekStart: string;
+  totalVolume: number;
+  totalSets: number;
+  totalExercises: number;
+}
+
+// Week comparison
+export interface WeekComparison {
+  current: WeeklyVolumeSummary;
+  previous: WeeklyVolumeSummary;
+  volumeChange: number;
+  setsChange: number;
+  exercisesChange: number;
+}

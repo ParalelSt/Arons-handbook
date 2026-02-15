@@ -13,6 +13,7 @@ import {
   getISOWeek,
 } from "date-fns";
 import { ChevronRight, Plus } from "lucide-react";
+import { AdBanner } from "@/components/ui/AdBanner";
 
 export function WeekDetailScreen() {
   const navigate = useNavigate();
@@ -82,8 +83,8 @@ export function WeekDetailScreen() {
               navigate(
                 `/workout/new?date=${format(
                   new Date(weekStart || new Date()),
-                  "yyyy-MM-dd"
-                )}&weekStart=${weekStart}`
+                  "yyyy-MM-dd",
+                )}&weekStart=${weekStart}`,
               )
             }
           >
@@ -132,7 +133,7 @@ export function WeekDetailScreen() {
                       <p
                         className={cn(
                           "text-sm",
-                          isRest ? "text-slate-600 italic" : "text-slate-400"
+                          isRest ? "text-slate-600 italic" : "text-slate-400",
                         )}
                       >
                         {getDayTitle(day)}
@@ -154,8 +155,8 @@ export function WeekDetailScreen() {
                           navigate(
                             `/workout/new?date=${format(
                               day,
-                              "yyyy-MM-dd"
-                            )}&weekStart=${weekStart}`
+                              "yyyy-MM-dd",
+                            )}&weekStart=${weekStart}`,
                           );
                         }}
                       >
@@ -166,6 +167,9 @@ export function WeekDetailScreen() {
                 </Card>
               );
             })}
+
+            {/* Ad placement — safe, between sections, not inside forms */}
+            <AdBanner className="mt-4" />
           </div>
         )}
       </div>

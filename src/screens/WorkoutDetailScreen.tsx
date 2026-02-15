@@ -7,6 +7,9 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Toast } from "@/components/ui/Toast";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { workoutApi, setApi, goalApi } from "@/lib/api";
+import { detectPR, savePR } from "@/lib/analytics";
+import { ExerciseProgress } from "@/components/ui/ExerciseProgress";
+import { PRBadge } from "@/components/ui/PRBadge";
 import type { WorkoutWithExercises } from "@/types";
 import { format, parseISO } from "date-fns";
 import { Plus, Trash2, Edit2, Save, X } from "lucide-react";
@@ -24,6 +27,7 @@ export function WorkoutDetailScreen() {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [goalToast, setGoalToast] = useState<string | null>(null);
+  const [prSets, setPrSets] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (workoutId) {
@@ -86,7 +90,7 @@ export function WorkoutDetailScreen() {
 
       // Update all modified sets
       const updates = Object.entries(editedSets).map(([setId, values]) =>
-        setApi.update(setId, values)
+        setApi.update(setId, values),
       );
 
       await Promise.all(updates);
@@ -103,7 +107,7 @@ export function WorkoutDetailScreen() {
         // Track which goals have been notified for this workout
         const notifiedKey = `goals-notified-${workoutId}`;
         const notifiedGoals = new Set(
-          JSON.parse(localStorage.getItem(notifiedKey) || "[]") as string[]
+          JSON.parse(localStorage.getItem(notifiedKey) || "[]") as string[],
         );
 
         data.workout_exercises.forEach((we) => {
@@ -128,9 +132,29 @@ export function WorkoutDetailScreen() {
         if (achievedGoals.length > 0) {
           localStorage.setItem(
             notifiedKey,
-            JSON.stringify(Array.from(notifiedGoals))
+            JSON.stringify(Array.from(notifiedGoals)),
           );
           setGoalToast(`🎉 You hit your goal for ${achievedGoals.join(", ")}!`);
+        }
+
+        // Check for PRs
+        const newPrSets = new Set<string>();
+        for (const we of data.workout_exercises) {
+          if (!we.exercise?.name || !we.sets) continue;
+          for (const set of we.sets) {
+            try {
+              const isPR = await detectPR(we.exercise.name, set.weight);
+              if (isPR) {
+                newPrSets.add(set.id);
+                await savePR(we.exercise.name, set.weight, set.reps, data.date);
+              }
+            } catch {
+              // Non-critical — skip PR detection on error
+            }
+          }
+        }
+        if (newPrSets.size > 0) {
+          setPrSets(newPrSets);
         }
       }
 
@@ -147,7 +171,7 @@ export function WorkoutDetailScreen() {
   function updateEditedSet(
     setId: string,
     field: "reps" | "weight",
-    value: string
+    value: string,
   ) {
     const numValue =
       field === "reps" ? parseInt(value) || 0 : parseFloat(value) || 0;
@@ -290,7 +314,7 @@ export function WorkoutDetailScreen() {
                                 label=""
                                 type="number"
                                 value={String(
-                                  editedSets[set.id]?.reps ?? set.reps
+                                  editedSets[set.id]?.reps ?? set.reps,
                                 )}
                                 onChange={(v) =>
                                   updateEditedSet(set.id, "reps", v)
@@ -303,7 +327,7 @@ export function WorkoutDetailScreen() {
                                 label=""
                                 type="number"
                                 value={String(
-                                  editedSets[set.id]?.weight ?? set.weight
+                                  editedSets[set.id]?.weight ?? set.weight,
                                 )}
                                 onChange={(v) =>
                                   updateEditedSet(set.id, "weight", v)
@@ -331,6 +355,7 @@ export function WorkoutDetailScreen() {
                                 <span className="text-slate-400 text-xs">
                                   kg
                                 </span>
+                                {prSets.has(set.id) && <PRBadge />}
                               </div>
                             </div>
                           )}
@@ -342,6 +367,18 @@ export function WorkoutDetailScreen() {
                       </p>
                     )}
                   </div>
+
+                  {/* Exercise Progress Comparison */}
+                  {workoutExercise.exercise?.name && workout && (
+                    <ExerciseProgress
+                      exerciseName={workoutExercise.exercise.name}
+                      currentWorkoutId={workout.id}
+                      currentMaxWeight={Math.max(
+                        ...(workoutExercise.sets || []).map((s) => s.weight),
+                        0,
+                      )}
+                    />
+                  )}
                 </Card>
               ))}
 

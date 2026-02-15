@@ -13,6 +13,7 @@ import { ExercisesScreen } from "@/screens/ExercisesScreen";
 import { TemplatesScreen } from "@/screens/TemplatesScreen";
 import { AddEditTemplateScreen } from "@/screens/AddEditTemplateScreen";
 import { GoalsScreen } from "@/screens/GoalsScreen";
+import { AnalyticsScreen } from "@/screens/AnalyticsScreen";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -163,6 +164,10 @@ function App() {
             <Route
               path="/goals"
               element={user ? <GoalsScreen /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/analytics"
+              element={user ? <AnalyticsScreen /> : <Navigate to="/login" />}
             />
           </Routes>
         </BrowserRouter>
