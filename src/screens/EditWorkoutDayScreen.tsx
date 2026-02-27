@@ -18,11 +18,13 @@ import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Toast } from "@/components/ui/Toast";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DayEditorPanel } from "@/components/ui/DayEditorPanel";
 import { workoutApi, workoutExerciseApi } from "@/lib/api";
+import { saveDayToLibrary } from "@/lib/dayLibraryService";
 import type { FormExercise } from "@/types";
 import { format, parseISO } from "date-fns";
-import { Save } from "lucide-react";
+import { Save, BookmarkPlus } from "lucide-react";
 
 // ─── Local type: FormExercise extended with DB ids ────────────────────────────
 // workoutExerciseId: references workout_exercises.id (undefined for new exercises)
@@ -42,12 +44,14 @@ export function EditWorkoutDayScreen() {
   const [workoutTitle, setWorkoutTitle] = useState("");
   const [workoutDate, setWorkoutDate] = useState("");
   const [weekStart, setWeekStart] = useState<string | null>(null);
+  const [dayName, setDayName] = useState("");
 
   const [liveExercises, setLiveExercises] = useState<LiveExercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
+  const [saveToLibraryConfirm, setSaveToLibraryConfirm] = useState(false);
 
   // ─── Load workout ────────────────────────────────────────────────────────────
 
@@ -61,8 +65,10 @@ export function EditWorkoutDayScreen() {
       setWorkoutTitle(data.title || "");
       setWorkoutDate(data.date);
 
-      // Derive the week start for back-navigation
       const dateObj = parseISO(data.date);
+      setDayName(format(dateObj, "EEEE"));
+
+      // Derive the week start for back-navigation
       const dow = dateObj.getDay(); // 0=Sun
       const diff = dow === 0 ? -6 : 1 - dow;
       const monday = new Date(dateObj);
@@ -122,7 +128,6 @@ export function EditWorkoutDayScreen() {
       return;
     }
 
-    // Validate sets
     for (const ex of validExercises) {
       if (ex.sets.length === 0) {
         setError(`"${ex.name}" has no sets. Add at least one set.`);
@@ -135,13 +140,42 @@ export function EditWorkoutDayScreen() {
       setError("");
       await workoutExerciseApi.saveAll(workoutId, validExercises);
       setToast("Workout saved!");
-      // Reload to sync DB state (picks up any generated IDs for new exercises)
       await loadWorkout();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to save";
       setError(msg);
     } finally {
       setSaving(false);
+    }
+  }
+
+  // ─── Save to Day Library ──────────────────────────────────────────────────────
+
+  async function handleSaveDayToLibrary() {
+    const validExercises = liveExercises.filter((ex) => ex.name.trim());
+    if (validExercises.length === 0) {
+      setError("Day must have at least one exercise to save to library.");
+      setSaveToLibraryConfirm(false);
+      return;
+    }
+    try {
+      await saveDayToLibrary({
+        name: dayName,
+        exercises: validExercises.map((ex) => ({
+          name: ex.name.trim(),
+          sets: ex.sets.map((s) => ({
+            reps: Math.max(1, s.reps || 1),
+            weight: Math.max(0, s.weight || 0),
+          })),
+        })),
+      });
+      setToast(`"${dayName}" saved to Day Library!`);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Failed to save to library";
+      setError(msg);
+    } finally {
+      setSaveToLibraryConfirm(false);
     }
   }
 
@@ -199,20 +233,34 @@ export function EditWorkoutDayScreen() {
       />
       <Breadcrumbs items={breadcrumbItems} />
 
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-5">
         {error && (
           <ErrorMessage message={error} onDismiss={() => setError("")} />
         )}
 
-        {/* Date badge */}
-        {workoutDate && (
-          <p className="text-slate-500 text-xs">
-            {format(parseISO(workoutDate), "MMMM d, yyyy")}
-          </p>
-        )}
-
-        {/* Exercise editor — same panel as template builder */}
+        {/* ── Day card — same structure as EditWeekTemplateScreen ── */}
         <Card className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-white font-semibold text-base">{dayName}</h3>
+              {workoutDate && (
+                <p className="text-slate-500 text-xs mt-0.5">
+                  {format(parseISO(workoutDate), "MMMM d, yyyy")}
+                </p>
+              )}
+            </div>
+            {liveExercises.length > 0 && (
+              <button
+                onClick={() => setSaveToLibraryConfirm(true)}
+                aria-label={`Save ${dayName} to library`}
+                className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                title="Save day to library"
+              >
+                <BookmarkPlus className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
           <DayEditorPanel
             exercises={liveExercises}
             onChange={handleExercisesChange}
@@ -226,6 +274,18 @@ export function EditWorkoutDayScreen() {
           {saving ? "Saving…" : "Save Workout"}
         </Button>
       </div>
+
+      {/* ── Save to library confirm ── */}
+      <ConfirmDialog
+        isOpen={saveToLibraryConfirm}
+        title="Save to Day Library"
+        message={`Save "${dayName}" with ${liveExercises.filter((e) => e.name.trim()).length} exercises to your Day Library?`}
+        confirmLabel="Save"
+        cancelLabel="Cancel"
+        isDestructive={false}
+        onConfirm={handleSaveDayToLibrary}
+        onCancel={() => setSaveToLibraryConfirm(false)}
+      />
 
       {toast && <Toast message={toast} onDismiss={() => setToast("")} />}
     </Container>
