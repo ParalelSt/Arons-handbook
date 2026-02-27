@@ -338,6 +338,144 @@ export const setApi = {
 };
 
 /**
+ * Live Workout Exercise Management
+ *
+ * Used exclusively by EditWorkoutDayScreen to mutate a live workout's exercises
+ * and sets. Never touches template tables — clone-not-link enforced at this layer.
+ */
+export const workoutExerciseApi = {
+  /**
+   * Full save: replaces all exercises + sets on a workout to match the given
+   * FormExercise list (order preserved via order_index).
+   *
+   * Strategy per exercise:
+   *  - existingId present  → update order_index, delete+reinsert sets
+   *  - existingId absent   → look up / create exercises row, insert workout_exercise + sets
+   *
+   * Exercises in DB but absent from the list are deleted (with their sets, which
+   * cascade via FK).
+   */
+  async saveAll(
+    workoutId: string,
+    exercises: Array<{
+      clientId: string;
+      name: string;
+      sets: { reps: number; weight: number }[];
+      workoutExerciseId?: string;
+    }>,
+  ): Promise<void> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    // 1. Fetch current workout_exercises IDs
+    const { data: currentRows, error: fetchErr } = await supabase
+      .from("workout_exercises")
+      .select("id")
+      .eq("workout_id", workoutId);
+    if (fetchErr) throw fetchErr;
+
+    const currentIds = new Set((currentRows ?? []).map((r: { id: string }) => r.id));
+    const keepIds = new Set(
+      exercises
+        .filter((e) => e.workoutExerciseId)
+        .map((e) => e.workoutExerciseId as string),
+    );
+
+    // 2. Delete exercises removed by the user
+    for (const id of currentIds) {
+      if (!keepIds.has(id)) {
+        const { error } = await supabase
+          .from("workout_exercises")
+          .delete()
+          .eq("id", id);
+        if (error) throw error;
+      }
+    }
+
+    // 3. Save each exercise in order
+    for (let i = 0; i < exercises.length; i++) {
+      const ex = exercises[i];
+
+      if (ex.workoutExerciseId) {
+        // 3a. Update order_index on existing row
+        const { error: updateErr } = await supabase
+          .from("workout_exercises")
+          .update({ order_index: i })
+          .eq("id", ex.workoutExerciseId);
+        if (updateErr) throw updateErr;
+
+        // 3b. Delete and reinsert sets (cleanest way to sync order)
+        const { error: delSetsErr } = await supabase
+          .from("sets")
+          .delete()
+          .eq("workout_exercise_id", ex.workoutExerciseId);
+        if (delSetsErr) throw delSetsErr;
+
+        if (ex.sets.length > 0) {
+          const setsToInsert = ex.sets.map((s, j) => ({
+            workout_exercise_id: ex.workoutExerciseId as string,
+            reps: Math.max(1, s.reps || 1),
+            weight: Math.max(0, s.weight || 0),
+            order_index: j,
+          }));
+          const { error: insertSetsErr } = await supabase
+            .from("sets")
+            .insert(setsToInsert);
+          if (insertSetsErr) throw insertSetsErr;
+        }
+      } else {
+        // 3c. New exercise — find or create the exercises table row
+        const trimmedName = ex.name.trim();
+        if (!trimmedName) continue;
+
+        let exerciseId: string;
+
+        const { data: existing } = await supabase
+          .from("exercises")
+          .select("id")
+          .eq("user_id", user.id)
+          .ilike("name", trimmedName)
+          .maybeSingle();
+
+        if (existing) {
+          exerciseId = existing.id;
+        } else {
+          const { data: created, error: createErr } = await supabase
+            .from("exercises")
+            .insert([{ name: trimmedName, user_id: user.id }])
+            .select("id")
+            .single();
+          if (createErr) throw createErr;
+          exerciseId = created.id;
+        }
+
+        const { data: newWE, error: weErr } = await supabase
+          .from("workout_exercises")
+          .insert([{ workout_id: workoutId, exercise_id: exerciseId, order_index: i }])
+          .select("id")
+          .single();
+        if (weErr) throw weErr;
+
+        if (ex.sets.length > 0) {
+          const setsToInsert = ex.sets.map((s, j) => ({
+            workout_exercise_id: newWE.id,
+            reps: Math.max(1, s.reps || 1),
+            weight: Math.max(0, s.weight || 0),
+            order_index: j,
+          }));
+          const { error: insertSetsErr } = await supabase
+            .from("sets")
+            .insert(setsToInsert);
+          if (insertSetsErr) throw insertSetsErr;
+        }
+      }
+    }
+  },
+};
+
+/**
  * Exercise Goals Management
  */
 export const goalApi = {

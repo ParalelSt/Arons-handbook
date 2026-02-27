@@ -10,6 +10,7 @@ import { workoutApi, setApi, goalApi } from "@/lib/api";
 import { detectPR, savePR } from "@/lib/analytics";
 import { ExerciseProgress } from "@/components/ui/ExerciseProgress";
 import { PRBadge } from "@/components/ui/PRBadge";
+import { SkeletonList } from "@/components/ui/SkeletonCard";
 import type { WorkoutWithExercises } from "@/types";
 import { format, parseISO } from "date-fns";
 import { Plus, Trash2, Edit2, Save, X } from "lucide-react";
@@ -187,9 +188,9 @@ export function WorkoutDetailScreen() {
   if (loading) {
     return (
       <Container>
-        <Header title="Loading..." onBack={() => navigate(-1)} />
-        <div className="text-center py-12">
-          <div className="text-slate-400">Loading workout...</div>
+        <Header title="Workout" onBack={() => navigate(-1)} />
+        <div className="container mx-auto px-4 py-6">
+          <SkeletonList count={3} lines={4} />
         </div>
       </Container>
     );
@@ -200,7 +201,13 @@ export function WorkoutDetailScreen() {
       <Container>
         <Header title="Not Found" onBack={() => navigate(-1)} />
         <div className="text-center py-12">
-          <div className="text-slate-400">Workout not found</div>
+          <p className="text-slate-400 mb-4">Workout not found</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+          >
+            Go back
+          </button>
         </div>
       </Container>
     );
@@ -224,19 +231,20 @@ export function WorkoutDetailScreen() {
                   variant="secondary"
                   onClick={cancelEditing}
                   disabled={saving}
+                  aria-label="Cancel editing"
                 >
                   <X className="w-4 h-4" />
                 </Button>
-                <Button onClick={saveEdits} disabled={saving}>
+                <Button onClick={saveEdits} disabled={saving} aria-label="Save changes">
                   <Save className="w-4 h-4" />
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="secondary" onClick={startEditing}>
+                <Button variant="secondary" onClick={startEditing} aria-label="Edit sets">
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button variant="danger" onClick={() => setDeleteConfirm(true)}>
+                <Button variant="danger" onClick={() => setDeleteConfirm(true)} aria-label="Delete workout">
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </>

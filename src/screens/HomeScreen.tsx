@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { SkeletonList } from "@/components/ui/SkeletonCard";
 import { workoutApi } from "@/lib/api";
 import { auth } from "@/lib/auth";
+import { isOnboardingDone } from "@/screens/OnboardingScreen";
 import type { WeekWorkouts } from "@/types";
 import { format, parseISO, getISOWeek } from "date-fns";
 import { Plus, ChevronRight, LogOut } from "lucide-react";
@@ -33,6 +35,11 @@ export function HomeScreen() {
       const data = await workoutApi.getByWeeks();
       setWeeks(data);
       setError(null);
+
+      // Redirect first-time users to onboarding
+      if (data.length === 0 && !isOnboardingDone()) {
+        navigate("/onboarding");
+      }
     } catch (err) {
       setError("Failed to load workouts");
       console.error(err);
@@ -115,11 +122,7 @@ export function HomeScreen() {
           </Button>
         </div>
 
-        {loading && (
-          <div className="text-center py-12">
-            <div className="text-slate-400">Loading your workouts...</div>
-          </div>
-        )}
+        {loading && <SkeletonList count={4} lines={3} />}
 
         {error && (
           <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 mb-4">

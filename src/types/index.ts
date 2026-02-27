@@ -236,6 +236,23 @@ export interface SaveDayInput {
   exercises: SaveExerciseInput[];
 }
 
+// ─── Shared Day Editor Form Types ─────────────────────────────────────────────
+// Used by both EditWeekTemplateScreen (templates) and EditWorkoutDayScreen (live
+// workouts). clientId is a stable React key that survives reordering without
+// causing input focus loss.
+
+export interface FormSet {
+  reps: number;
+  weight: number;
+}
+
+export interface FormExercise {
+  /** Stable React key — assign crypto.randomUUID() on creation, never change it */
+  clientId: string;
+  name: string;
+  sets: FormSet[];
+}
+
 // ─── Exercise Library Types ───────────────────────────────────────────────────
 
 export interface ExerciseLibraryItem {

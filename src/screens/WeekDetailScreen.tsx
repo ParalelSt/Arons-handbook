@@ -12,8 +12,9 @@ import {
   endOfWeek,
   getISOWeek,
 } from "date-fns";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Edit2 } from "lucide-react";
 import { AdBanner } from "@/components/ui/AdBanner";
+import { SkeletonList } from "@/components/ui/SkeletonCard";
 
 export function WeekDetailScreen() {
   const navigate = useNavigate();
@@ -100,11 +101,7 @@ export function WeekDetailScreen() {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        {loading && (
-          <div className="text-center py-12">
-            <div className="text-slate-400">Loading week...</div>
-          </div>
-        )}
+        {loading && <SkeletonList count={7} lines={2} />}
 
         {!loading && (
           <div className="space-y-2 sm:space-y-3">
@@ -117,11 +114,18 @@ export function WeekDetailScreen() {
               return (
                 <Card
                   key={day.toISOString()}
-                  onClick={() => workout && navigate(`/workout/${workout.id}`)}
-                  className={cn("p-5", isRest && "opacity-60 cursor-default")}
+                  className={cn("p-5", isRest && "opacity-60")}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex-1">
+                    <div
+                      className={cn(
+                        "flex-1 min-w-0",
+                        workout && "cursor-pointer",
+                      )}
+                      onClick={() =>
+                        workout && navigate(`/workout/${workout.id}`)
+                      }
+                    >
                       <div className="flex items-center gap-3 mb-1">
                         <h3 className="text-lg font-semibold text-white">
                           {dayName}
@@ -145,24 +149,48 @@ export function WeekDetailScreen() {
                         </p>
                       )}
                     </div>
-                    {workout ? (
-                      <ChevronRight className="w-6 h-6 text-slate-500" />
-                    ) : (
-                      <button
-                        className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(
-                            `/workout/new?date=${format(
-                              day,
-                              "yyyy-MM-dd",
-                            )}&weekStart=${weekStart}`,
-                          );
-                        }}
-                      >
-                        + Add
-                      </button>
-                    )}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      {workout ? (
+                        <>
+                          {/* Edit day button */}
+                          <button
+                            onClick={() =>
+                              navigate(`/workout/${workout.id}/edit`)
+                            }
+                            aria-label={`Edit ${dayName}`}
+                            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          {/* View button */}
+                          <button
+                            onClick={() =>
+                              navigate(`/workout/${workout.id}`)
+                            }
+                            aria-label={`View ${dayName}`}
+                            className="p-2 text-slate-500 hover:text-slate-300 rounded-lg transition-colors"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
+                          onClick={() =>
+                            navigate(
+                              `/workout/new?date=${format(
+                                day,
+                                "yyyy-MM-dd",
+                              )}&weekStart=${weekStart}`,
+                            )
+                          }
+                        >
+                          + Add
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </Card>
               );

@@ -15,6 +15,8 @@ import { AddEditTemplateScreen } from "@/screens/AddEditTemplateScreen";
 import { GoalsScreen } from "@/screens/GoalsScreen";
 import { AnalyticsScreen } from "@/screens/AnalyticsScreen";
 import { EditWeekTemplateScreen } from "@/screens/EditWeekTemplateScreen";
+import { EditWorkoutDayScreen } from "@/screens/EditWorkoutDayScreen";
+import { OnboardingScreen } from "@/screens/OnboardingScreen";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -174,6 +176,18 @@ function App() {
               path="/week-templates/:templateId/edit"
               element={
                 user ? <EditWeekTemplateScreen /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/workout/:workoutId/edit"
+              element={
+                user ? <EditWorkoutDayScreen /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/onboarding"
+              element={
+                user ? <OnboardingScreen /> : <Navigate to="/login" />
               }
             />
           </Routes>

@@ -1,0 +1,96 @@
+# Project File Structure
+
+- APK_GUIDE.md
+- CLEANUP_SUMMARY.md
+- create-icons.cjs
+- DEPLOYMENT.md
+- eslint.config.js
+- index.html
+- package.json
+- postcss.config.js
+- QUICKSTART.md
+- README.md
+- tsconfig.app.json
+- tsconfig.json
+- tsconfig.node.json
+- vercel.json
+- vite.config.ts
+- public/
+    - manifest.json
+- src/
+    - App.tsx
+    - index.css
+    - main.tsx
+    - assets/
+    - components/
+        - ui/
+            - Breadcrumbs.tsx
+            - ConfirmDialog.tsx
+            - ErrorMessage.tsx
+            - Form.tsx
+            - Layout.tsx
+            - PWAPrompt.tsx
+            - ThemeSelector.tsx
+            - Toast.tsx
+    - contexts/
+        - ThemeContext.tsx
+    - lib/
+        - api.ts
+        - auth.ts
+        - storage.ts
+        - supabase.ts
+        - templates.ts
+        - theme.ts
+        - utils.ts
+    - screens/
+        - AddEditTemplateScreen.tsx
+        - AddWorkoutScreen.tsx
+        - ExercisesScreen.tsx
+        - GoalsScreen.tsx
+        - HomeScreen.tsx
+        - LoginScreen.tsx
+        - TemplatesScreen.tsx
+        - WeekDetailScreen.tsx
+        - WorkoutDetailScreen.tsx
+    - types/
+        - index.ts
+- supabase/
+    - schema.sql
+    - templates_migration.sql
+    - migrations/
+        - 20251206_add_exercise_goals.sql
+    - seeds/
+        - exercise_goals.sql
+    - migrations/
+        - 20260215_exercise_day_library.sql
+
+# Prompts and Nuances Given to Copilot
+
+1. Major UX and architecture overhaul of the weekly template system in a Gym Logbook (React + TypeScript + Supabase) app.
+2. Implement a reusable library system for exercises and days.
+3. Professional template builder UX, advanced exercise sorting/grouping, import day functionality.
+4. Strict separation of templates/workouts/libraries, clone-not-link for all imports.
+5. All new features must be modular, reusable, and follow provided UI/UX and architecture rules.
+6. No cross-linking between templates/workouts/libraries.
+7. All code must be TypeScript strict, no 'any', and use existing UI components.
+8. SQL migration for new library tables, new types/services, UI modals, drag-and-drop, import/clone logic, confirmations, and full verification.
+9. All library imports are deep clones, never references; sort/group logic is local and persisted.
+10. All new features are modular and reusable.
+11. Do not refactor unrelated logic. Follow existing UI styles strictly. Keep strict TypeScript. Do not use any. Reuse existing components.
+12. Allow pulling existing exercises, allow pulling full existing days, fix and professionalize the exercise sorting system.
+13. Improve the template-building UX to feel professional and scalable.
+14. Verification checklist: modularity, strict separation, clone-not-link, strict TypeScript, UI reuse, production-ready.
+15. Week generation logic: always start from Monday, generate for next week if user already trained this week, never mid-week starts.
+16. Stage, commit, and push changes as requested.
+17. Provide detailed commit messages and error handling.
+18. Provide a text file with the full file structure and all prompts/nuances for Claude guidance.
+
+# Additional Nuances
+- Use modal-driven UX, drag-and-drop, confirmation dialogs, strict RLS in SQL, auto-focus, and validation.
+- All new/modified files checked for errors, TypeScript and runtime checks passed.
+- All features tested via TypeScript and runtime checks, zero errors.
+- If you want to select a weekly plan, use TemplatesScreen to create or pick a template, then edit it.
+- If you want to import exercises or days, use the "Library" or "Import existing day" buttons in the day card.
+- Week generation logic checks last workout date and generates for next Monday if user already trained this week.
+- If you haven't trained this week, it generates for the current week (always starting from Monday).
+- No unrelated refactoring, strict TypeScript, no 'any', reuse of existing components, and production-ready code.

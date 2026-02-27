@@ -102,6 +102,7 @@ interface ButtonProps {
   className?: string;
   type?: "button" | "submit";
   disabled?: boolean;
+  "aria-label"?: string;
 }
 
 export function Button({
@@ -111,6 +112,7 @@ export function Button({
   className,
   type = "button",
   disabled = false,
+  "aria-label": ariaLabel,
 }: ButtonProps) {
   const { currentTheme } = useTheme();
   const theme = getTheme(currentTheme);
@@ -126,6 +128,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
+      aria-label={ariaLabel}
       className={cn(
         "px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base",
         "disabled:opacity-50 disabled:cursor-not-allowed",

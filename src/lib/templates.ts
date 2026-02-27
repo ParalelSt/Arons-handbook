@@ -287,10 +287,7 @@ export const templateApi = {
       ),
     };
 
-    console.log("Creating workout with input:", workoutInput); // Debug log
-
     const workout = await workoutApi.create(workoutInput);
-    console.log("Created workout:", workout); // Debug log
     return workout.id;
   },
 };
