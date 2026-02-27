@@ -29,8 +29,8 @@ import {
   Plus,
   Trash2,
   GripVertical,
-  ChevronUp,
-  ChevronDown,
+  ArrowUp,
+  ArrowDown,
   Download,
 } from "lucide-react";
 
@@ -291,22 +291,22 @@ export function DayEditorPanel({
               />
 
               {/* Move up / down */}
-              <div className="flex flex-col flex-shrink-0">
+              <div className="flex flex-row gap-0.5 shrink-0">
                 <button
                   onClick={() => moveExercise(exIndex, exIndex - 1)}
                   disabled={exIndex === 0}
                   aria-label="Move exercise up"
-                  className="p-0.5 text-slate-600 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronUp className="w-3.5 h-3.5" />
+                  <ArrowUp className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => moveExercise(exIndex, exIndex + 1)}
                   disabled={exIndex === exercises.length - 1}
                   aria-label="Move exercise down"
-                  className="p-0.5 text-slate-600 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronDown className="w-3.5 h-3.5" />
+                  <ArrowDown className="w-4 h-4" />
                 </button>
               </div>
 
@@ -323,7 +323,7 @@ export function DayEditorPanel({
             {ex.sets.length > 0 && (
               <div className="mb-2">
                 <div className="grid grid-cols-[auto_auto_1fr_1fr_auto] gap-2 text-xs text-slate-500 mb-1 px-1">
-                  <span className="w-4" />
+                  <span className="w-16" />
                   <span className="w-6 text-center">Set</span>
                   <span>Reps</span>
                   <span>Weight (kg)</span>
@@ -336,22 +336,22 @@ export function DayEditorPanel({
                     className="grid grid-cols-[auto_auto_1fr_1fr_auto] gap-2 items-center mb-1.5"
                   >
                     {/* Set reorder */}
-                    <div className="flex flex-col w-4">
+                    <div className="flex flex-row gap-0.5">
                       <button
                         onClick={() => moveSet(exIndex, setIndex, setIndex - 1)}
                         disabled={setIndex === 0}
                         aria-label="Move set up"
-                        className="text-slate-600 hover:text-slate-400 disabled:opacity-20 transition-colors"
+                        className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       >
-                        <ChevronUp className="w-3 h-3" />
+                        <ArrowUp className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => moveSet(exIndex, setIndex, setIndex + 1)}
                         disabled={setIndex === ex.sets.length - 1}
                         aria-label="Move set down"
-                        className="text-slate-600 hover:text-slate-400 disabled:opacity-20 transition-colors"
+                        className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       >
-                        <ChevronDown className="w-3 h-3" />
+                        <ArrowDown className="w-4 h-4" />
                       </button>
                     </div>
 
