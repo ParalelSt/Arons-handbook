@@ -291,12 +291,12 @@ export function DayEditorPanel({
               />
 
               {/* Move up / down */}
-              <div className="flex flex-row gap-0.5 shrink-0">
+              <div className="flex flex-col shrink-0">
                 <button
                   onClick={() => moveExercise(exIndex, exIndex - 1)}
                   disabled={exIndex === 0}
                   aria-label="Move exercise up"
-                  className="p-1.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                  className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 >
                   <ArrowUp className="w-4 h-4" />
                 </button>
@@ -304,7 +304,7 @@ export function DayEditorPanel({
                   onClick={() => moveExercise(exIndex, exIndex + 1)}
                   disabled={exIndex === exercises.length - 1}
                   aria-label="Move exercise down"
-                  className="p-1.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                  className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 >
                   <ArrowDown className="w-4 h-4" />
                 </button>
@@ -323,7 +323,7 @@ export function DayEditorPanel({
             {ex.sets.length > 0 && (
               <div className="mb-2">
                 <div className="grid grid-cols-[auto_auto_1fr_1fr_auto] gap-2 text-xs text-slate-500 mb-1 px-1">
-                  <span className="w-16" />
+                  <span className="w-8" />
                   <span className="w-6 text-center">Set</span>
                   <span>Reps</span>
                   <span>Weight (kg)</span>
@@ -336,12 +336,12 @@ export function DayEditorPanel({
                     className="grid grid-cols-[auto_auto_1fr_1fr_auto] gap-2 items-center mb-1.5"
                   >
                     {/* Set reorder */}
-                    <div className="flex flex-row gap-0.5">
+                    <div className="flex flex-col">
                       <button
                         onClick={() => moveSet(exIndex, setIndex, setIndex - 1)}
                         disabled={setIndex === 0}
                         aria-label="Move set up"
-                        className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                        className="p-0.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       >
                         <ArrowUp className="w-4 h-4" />
                       </button>
@@ -349,7 +349,7 @@ export function DayEditorPanel({
                         onClick={() => moveSet(exIndex, setIndex, setIndex + 1)}
                         disabled={setIndex === ex.sets.length - 1}
                         aria-label="Move set down"
-                        className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                        className="p-0.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       >
                         <ArrowDown className="w-4 h-4" />
                       </button>
