@@ -16,7 +16,7 @@ export function Container({ children, className }: ContainerProps) {
   return (
     <div
       className={cn(
-        `min-h-screen bg-gradient-to-br ${theme.colors.bg.gradient}`,
+        `min-h-screen bg-linear-to-br ${theme.colors.bg.gradient}`,
         className
       )}
     >
@@ -32,14 +32,17 @@ interface HeaderProps {
 }
 
 export function Header({ title, onBack, action }: HeaderProps) {
+  const { currentTheme } = useTheme();
+  const theme = getTheme(currentTheme);
+
   return (
-    <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-10">
+    <header className={`${theme.colors.header.bg} backdrop-blur-sm border-b ${theme.colors.header.border} sticky top-0 z-10`}>
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onBack && (
             <button
               onClick={onBack}
-              className="p-2 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
+              className="p-2 hover:bg-slate-700 rounded-lg transition-colors shrink-0"
               aria-label="Go back"
             >
               <svg
@@ -62,7 +65,7 @@ export function Header({ title, onBack, action }: HeaderProps) {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          {action && <div className="flex-shrink-0">{action}</div>}
+          {action && <div className="shrink-0">{action}</div>}
           <ThemeSelector />
         </div>
       </div>

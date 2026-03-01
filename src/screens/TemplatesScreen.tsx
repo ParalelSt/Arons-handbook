@@ -2,58 +2,57 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Header, Card, Button } from "@/components/ui/Layout";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { Modal, Input } from "@/components/ui/Form";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Toast } from "@/components/ui/Toast";
-import { templateApi } from "@/lib/templates";
+import { SkeletonList } from "@/components/ui/SkeletonCard";
 import {
   getAllWeekTemplates,
   createWeekTemplate,
   deleteWeekTemplate,
   generateWeekFromTemplate,
+  getAllDayTemplatesWithWeekNames,
+  createWorkoutFromDayTemplate,
 } from "@/lib/weekTemplateService";
-import type { WorkoutTemplateWithExercises, WeekTemplate } from "@/types";
+import type { WeekTemplate } from "@/types";
+import type { DayTemplateInfo } from "@/lib/weekTemplateService";
+import { useTheme } from "@/contexts/ThemeContext";
+import { getTheme } from "@/lib/theme";
 import {
   Plus,
-  Copy,
   Edit,
   Trash2,
-  Play,
   CalendarPlus,
   Calendar,
+  Play,
+  Dumbbell,
 } from "lucide-react";
 import { format, startOfWeek } from "date-fns";
 import { supabase } from "@/lib/supabase";
 
-type Tab = "workout" | "weekly";
+type Tab = "daily" | "weekly";
 
 export function TemplatesScreen() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab =
-    searchParams.get("tab") === "weekly" ? "weekly" : "workout";
+  const { currentTheme } = useTheme();
+  const theme = getTheme(currentTheme);
+
+  const initialTab: Tab =
+    searchParams.get("tab") === "weekly" ? "weekly" : "daily";
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
-  // ─── Workout Templates state ────────────────────────────────────────────────
+  // ─── Daily tab state ─────────────────────────────────────────────────────────
 
-  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>(
-    [],
+  const [dayTemplates, setDayTemplates] = useState<DayTemplateInfo[]>([]);
+  const [loadingDaily, setLoadingDaily] = useState(true);
+  const [useDayTarget, setUseDayTarget] = useState<DayTemplateInfo | null>(
+    null,
   );
-  const [loadingWorkout, setLoadingWorkout] = useState(true);
-  const [error, setError] = useState<string>("");
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<WorkoutTemplateWithExercises | null>(null);
-  const [showCopyModal, setShowCopyModal] = useState(false);
-  const [copyName, setCopyName] = useState("");
-  const [showUseModal, setShowUseModal] = useState(false);
-  const [workoutDate, setWorkoutDate] = useState(
-    format(new Date(), "yyyy-MM-dd"),
-  );
-  const [deleteConfirm, setDeleteConfirm] =
-    useState<WorkoutTemplateWithExercises | null>(null);
+  const [useDayDate, setUseDayDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [creatingFromDay, setCreatingFromDay] = useState(false);
 
-  // ─── Weekly Templates state ─────────────────────────────────────────────────
+  // ─── Weekly tab state ────────────────────────────────────────────────────────
 
   const [weekTemplates, setWeekTemplates] = useState<WeekTemplate[]>([]);
   const [loadingWeekly, setLoadingWeekly] = useState(true);
@@ -66,6 +65,10 @@ export function TemplatesScreen() {
   const [weekGenerateTarget, setWeekGenerateTarget] =
     useState<WeekTemplate | null>(null);
   const [generatingWeek, setGeneratingWeek] = useState(false);
+
+  // ─── Shared state ────────────────────────────────────────────────────────────
+
+  const [error, setError] = useState<string>("");
   const [toast, setToast] = useState("");
 
   // ─── Tab switching ──────────────────────────────────────────────────────────
@@ -75,35 +78,27 @@ export function TemplatesScreen() {
     setSearchParams(tab === "weekly" ? { tab: "weekly" } : {});
   }
 
-  // ─── Load Workout Templates ─────────────────────────────────────────────────
+  // ─── Load data ───────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    loadWorkoutTemplates();
+    void loadDailyTemplates();
+    void loadWeeklyTemplates();
   }, []);
 
-  async function loadWorkoutTemplates() {
+  async function loadDailyTemplates() {
     try {
-      setLoadingWorkout(true);
+      setLoadingDaily(true);
       setError("");
-      const data = await templateApi.getAll();
-      setTemplates(data);
+      const data = await getAllDayTemplatesWithWeekNames();
+      setDayTemplates(data);
     } catch (err: unknown) {
       const msg =
-        err instanceof Error
-          ? err.message
-          : "Failed to load templates. Make sure you've run the templates migration in Supabase.";
-      console.error(err);
+        err instanceof Error ? err.message : "Failed to load daily templates";
       setError(msg);
     } finally {
-      setLoadingWorkout(false);
+      setLoadingDaily(false);
     }
   }
-
-  // ─── Load Weekly Templates ──────────────────────────────────────────────────
-
-  useEffect(() => {
-    loadWeeklyTemplates();
-  }, []);
 
   async function loadWeeklyTemplates() {
     try {
@@ -112,69 +107,35 @@ export function TemplatesScreen() {
       setWeekTemplates(data);
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : "Failed to load weekly templates";
-      console.error("[TemplatesScreen] loadWeeklyTemplates error:", err);
+        err instanceof Error ? err.message : "Failed to load weekly plans";
       setError(msg);
     } finally {
       setLoadingWeekly(false);
     }
   }
 
-  // ─── Workout Template actions ───────────────────────────────────────────────
+  // ─── Daily: use a day template ───────────────────────────────────────────────
 
-  async function handleCopy() {
-    if (!selectedTemplate || !copyName.trim()) return;
+  async function handleUseDay() {
+    if (!useDayTarget) return;
     try {
+      setCreatingFromDay(true);
       setError("");
-      await templateApi.copy(selectedTemplate.id, copyName.trim());
-      setShowCopyModal(false);
-      setCopyName("");
-      setSelectedTemplate(null);
-      loadWorkoutTemplates();
-    } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to copy template";
-      console.error(err);
-      setError(msg);
-    }
-  }
-
-  async function handleDeleteWorkout() {
-    if (!deleteConfirm) return;
-    try {
-      setError("");
-      await templateApi.delete(deleteConfirm.id);
-      setDeleteConfirm(null);
-      loadWorkoutTemplates();
-    } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to delete template";
-      console.error(err);
-      setError(msg);
-      setDeleteConfirm(null);
-    }
-  }
-
-  async function handleUseTemplate() {
-    if (!selectedTemplate) return;
-    try {
-      setError("");
-      const workoutId = await templateApi.createWorkoutFromTemplate(
-        selectedTemplate.id,
-        workoutDate,
+      const workoutId = await createWorkoutFromDayTemplate(
+        useDayTarget.id,
+        useDayDate,
       );
-      navigate(`/workout/${workoutId}`);
+      setUseDayTarget(null);
+      navigate(`/workout/${workoutId}/edit`);
     } catch (err: unknown) {
       const msg =
-        err instanceof Error
-          ? err.message
-          : "Failed to create workout from template.";
-      console.error(err);
+        err instanceof Error ? err.message : "Failed to create workout";
       setError(msg);
+      setCreatingFromDay(false);
     }
   }
 
-  // ─── Weekly Template actions ────────────────────────────────────────────────
+  // ─── Weekly: create ──────────────────────────────────────────────────────────
 
   async function handleWeekCreate() {
     if (!newWeekName.trim()) return;
@@ -187,12 +148,13 @@ export function TemplatesScreen() {
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "Failed to create template";
-      console.error("[TemplatesScreen] week create error:", err);
       setError(msg);
     } finally {
       setCreatingWeek(false);
     }
   }
+
+  // ─── Weekly: delete ──────────────────────────────────────────────────────────
 
   async function handleWeekDelete() {
     if (!weekDeleteTarget) return;
@@ -201,40 +163,41 @@ export function TemplatesScreen() {
       setToast(`"${weekDeleteTarget.name}" deleted`);
       setWeekDeleteTarget(null);
       await loadWeeklyTemplates();
+      await loadDailyTemplates(); // days also change
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "Failed to delete template";
-      console.error("[TemplatesScreen] week delete error:", err);
       setError(msg);
       setWeekDeleteTarget(null);
     }
   }
 
+  // ─── Weekly: generate week ───────────────────────────────────────────────────
+
   async function handleWeekGenerate() {
     if (!weekGenerateTarget) return;
     try {
       setGeneratingWeek(true);
-      // Find last workout date
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const { data, error } = await supabase
+      const { data, error: dbErr } = await supabase
         .from("workouts")
         .select("date")
         .eq("user_id", user.id)
         .order("date", { ascending: false })
         .limit(1);
-      if (error) throw error;
+      if (dbErr) throw dbErr;
       let weekStartDate = startOfWeek(new Date(), { weekStartsOn: 1 });
       if (data && data.length > 0 && data[0].date) {
-        const lastWorkoutDate = new Date(data[0].date);
-        const lastWeekStart = startOfWeek(lastWorkoutDate, { weekStartsOn: 1 });
+        const lastWeekStart = startOfWeek(new Date(data[0].date), {
+          weekStartsOn: 1,
+        });
         const thisWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-        // If last workout is in this week, generate for next week
         if (lastWeekStart.getTime() === thisWeekStart.getTime()) {
           weekStartDate = new Date(thisWeekStart);
-          weekStartDate.setDate(weekStartDate.getDate() + 7); // Next Monday
+          weekStartDate.setDate(weekStartDate.getDate() + 7);
         }
       }
       const ids = await generateWeekFromTemplate(
@@ -248,7 +211,6 @@ export function TemplatesScreen() {
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "Failed to generate week";
-      console.error("[TemplatesScreen] generate error:", err);
       setError(msg);
       setWeekGenerateTarget(null);
     } finally {
@@ -256,7 +218,25 @@ export function TemplatesScreen() {
     }
   }
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  // ─── Group daily templates by week template ──────────────────────────────────
+
+  const daysByWeek = dayTemplates.reduce<
+    { weekName: string; weekId: string; days: DayTemplateInfo[] }[]
+  >((acc, day) => {
+    const existing = acc.find((g) => g.weekId === day.weekTemplateId);
+    if (existing) {
+      existing.days.push(day);
+    } else {
+      acc.push({
+        weekName: day.weekTemplateName,
+        weekId: day.weekTemplateId,
+        days: [day],
+      });
+    }
+    return acc;
+  }, []);
+
+  // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <Container>
@@ -264,16 +244,12 @@ export function TemplatesScreen() {
         title="Templates"
         onBack={() => navigate("/")}
         action={
-          activeTab === "workout" ? (
-            <Button onClick={() => navigate("/templates/new")}>
-              <Plus className="w-5 h-5" />
-            </Button>
-          ) : (
+          activeTab === "weekly" ? (
             <Button onClick={() => setShowWeekCreate(true)}>
               <Plus className="w-4 h-4 inline mr-1" />
               New
             </Button>
-          )
+          ) : undefined
         }
       />
       <Breadcrumbs
@@ -284,23 +260,23 @@ export function TemplatesScreen() {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        {/* Tab bar */}
+        {/* ── Tab bar ── */}
         <div className="flex gap-1 bg-slate-800/50 rounded-lg p-1 mb-5">
           <button
-            onClick={() => switchTab("workout")}
+            onClick={() => switchTab("daily")}
             className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === "workout"
-                ? "bg-blue-600 text-white"
+              activeTab === "daily"
+                ? theme.colors.tabActive
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            Workout
+            Daily
           </button>
           <button
             onClick={() => switchTab("weekly")}
             className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === "weekly"
-                ? "bg-blue-600 text-white"
+                ? theme.colors.tabActive
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -312,113 +288,91 @@ export function TemplatesScreen() {
           <ErrorMessage message={error} onDismiss={() => setError("")} />
         )}
 
-        {/* ═══════════════ WORKOUT TEMPLATES TAB ═══════════════ */}
-        {activeTab === "workout" && (
-          <>
-            {loadingWorkout && (
-              <div className="text-center py-12">
-                <div className="text-slate-400">Loading templates...</div>
-              </div>
-            )}
+        {/* ════════════════ DAILY TAB ════════════════ */}
+        {activeTab === "daily" && (
+          <div className="space-y-5">
+            {loadingDaily && <SkeletonList count={3} lines={3} />}
 
-            {!loadingWorkout && templates.length === 0 && (
-              <div className="text-center py-12">
-                <h2 className="text-2xl text-white mb-2">No Templates Yet</h2>
-                <p className="text-slate-400 mb-6">
-                  Create templates for your regular workouts
+            {!loadingDaily && dayTemplates.length === 0 && (
+              <div className="text-center py-16 px-4">
+                <Dumbbell className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                <h2 className="text-xl text-white mb-2">No Daily Templates</h2>
+                <p className="text-slate-400 mb-6 max-w-sm mx-auto">
+                  Daily templates come from your weekly plans. Create a weekly
+                  plan and add training days to see them here.
                 </p>
-                <Button onClick={() => navigate("/templates/new")}>
-                  <Plus className="w-5 h-5 inline mr-2" />
-                  Create Template
+                <Button onClick={() => switchTab("weekly")}>
+                  Go to Weekly Plans
                 </Button>
               </div>
             )}
 
-            {!loadingWorkout && templates.length > 0 && (
-              <div className="space-y-3">
-                {templates.map((template) => (
-                  <Card key={template.id} className="p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-white mb-1">
-                          {template.name}
-                        </h3>
-                        {template.description && (
-                          <p className="text-slate-400 text-sm mb-2">
-                            {template.description}
-                          </p>
-                        )}
-                        <p className="text-slate-500 text-xs">
-                          {template.template_exercises.length} exercise
-                          {template.template_exercises.length !== 1 ? "s" : ""}
-                        </p>
-                      </div>
-                    </div>
+            {!loadingDaily &&
+              daysByWeek.map((group) => (
+                <div key={group.weekId}>
+                  {/* Week group header */}
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      {group.weekName}
+                    </p>
+                    <button
+                      onClick={() =>
+                        navigate(`/week-templates/${group.weekId}/edit`)
+                      }
+                      className="text-xs text-slate-500 hover:text-slate-300 transition-colors flex items-center gap-1"
+                    >
+                      <Edit className="w-3 h-3" />
+                      Edit plan
+                    </button>
+                  </div>
 
-                    {/* Exercise list */}
-                    <div className="space-y-1 mb-4 pl-3 border-l-2 border-slate-700">
-                      {template.template_exercises.map((te) => (
-                        <div key={te.id} className="text-sm">
-                          <span className="text-slate-300">
-                            {te.exercise?.name}
-                          </span>
-                          <span className="text-slate-600 ml-2">
-                            {te.target_sets} sets
-                            {te.target_reps && ` × ${te.target_reps} reps`}
-                            {te.target_weight && ` × ${te.target_weight}kg`}
-                          </span>
+                  <div className="space-y-2">
+                    {group.days.map((day) => (
+                      <Card key={day.id} className="p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-white font-semibold">
+                              {day.name}
+                            </h3>
+                            <p className="text-slate-500 text-xs mt-0.5">
+                              {day.exercises.length} exercise
+                              {day.exercises.length !== 1 ? "s" : ""}
+                              {day.exercises.length > 0 && (
+                                <span className="text-slate-600">
+                                  {" "}
+                                  ·{" "}
+                                  {day.exercises
+                                    .slice(0, 3)
+                                    .map((e) => e.name)
+                                    .join(", ")}
+                                  {day.exercises.length > 3 && "…"}
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setUseDayTarget(day);
+                              setUseDayDate(format(new Date(), "yyyy-MM-dd"));
+                            }}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${theme.colors.button.primary}`}
+                          >
+                            <Play className="w-3.5 h-3.5" />
+                            Use
+                          </button>
                         </div>
-                      ))}
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setSelectedTemplate(template);
-                          setShowUseModal(true);
-                        }}
-                        className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-                      >
-                        <Play className="w-4 h-4" />
-                        Use
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedTemplate(template);
-                          setCopyName(`${template.name} (Copy)`);
-                          setShowCopyModal(true);
-                        }}
-                        className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          navigate(`/templates/${template.id}/edit`)
-                        }
-                        className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirm(template)}
-                        className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-400" />
-                      </button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              ))}
+          </div>
         )}
 
-        {/* ═══════════════ WEEKLY TEMPLATES TAB ═══════════════ */}
+        {/* ════════════════ WEEKLY TAB ════════════════ */}
         {activeTab === "weekly" && (
           <div className="space-y-4">
-            {/* Inline Create Form */}
+            {/* Inline create form */}
             {showWeekCreate && (
               <Card className="p-4">
                 <h3 className="text-white font-semibold mb-3">
@@ -429,15 +383,17 @@ export function TemplatesScreen() {
                     value={newWeekName}
                     onChange={(e) => setNewWeekName(e.target.value)}
                     placeholder="Plan name (e.g. Push/Pull/Legs)"
-                    onKeyDown={(e) => e.key === "Enter" && handleWeekCreate()}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") void handleWeekCreate();
+                    }}
                     autoFocus
-                    className="flex-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <Button
                     onClick={handleWeekCreate}
                     disabled={creatingWeek || !newWeekName.trim()}
                   >
-                    {creatingWeek ? "..." : "Create"}
+                    {creatingWeek ? "…" : "Create"}
                   </Button>
                   <Button
                     variant="secondary"
@@ -452,22 +408,15 @@ export function TemplatesScreen() {
               </Card>
             )}
 
-            {/* Loading */}
-            {loadingWeekly && (
-              <div className="text-center py-12">
-                <div className="text-slate-400">Loading weekly plans...</div>
-              </div>
-            )}
+            {loadingWeekly && <SkeletonList count={3} lines={2} />}
 
-            {/* Empty state */}
             {!loadingWeekly && weekTemplates.length === 0 && (
               <div className="text-center py-16 px-4">
                 <Calendar className="w-12 h-12 text-slate-600 mx-auto mb-4" />
                 <h2 className="text-xl text-white mb-2">No Weekly Plans Yet</h2>
                 <p className="text-slate-400 mb-6 max-w-sm mx-auto">
-                  Create a weekly template to plan your training days,
-                  exercises, and sets — then generate a full week of workouts
-                  from it.
+                  Create a weekly plan to organise your training days. Each day
+                  you add will also appear in the Daily tab.
                 </p>
                 <Button onClick={() => setShowWeekCreate(true)}>
                   <Plus className="w-4 h-4 inline mr-1" />
@@ -476,7 +425,6 @@ export function TemplatesScreen() {
               </div>
             )}
 
-            {/* List */}
             {!loadingWeekly &&
               weekTemplates.map((t) => (
                 <Card key={t.id} className="p-4">
@@ -498,7 +446,9 @@ export function TemplatesScreen() {
                         <CalendarPlus className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={() => navigate(`/week-templates/${t.id}/edit`)}
+                        onClick={() =>
+                          navigate(`/week-templates/${t.id}/edit`)
+                        }
                         className="p-2 text-blue-400 hover:bg-blue-900/30 rounded-lg transition-colors"
                         title="Edit"
                       >
@@ -519,97 +469,57 @@ export function TemplatesScreen() {
         )}
       </div>
 
-      {/* ─── Modals ───────────────────────────────────────────── */}
-
-      {/* Copy Workout Template Modal */}
-      <Modal
-        isOpen={showCopyModal}
-        onClose={() => {
-          setShowCopyModal(false);
-          setSelectedTemplate(null);
-          setCopyName("");
-        }}
-        title="Copy Template"
-      >
-        <div className="space-y-4">
-          <Input
-            label="New Template Name"
-            value={copyName}
-            onChange={setCopyName}
-            placeholder="e.g., Push Day v2"
-            required
-          />
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => setShowCopyModal(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleCopy}
-              disabled={!copyName.trim()}
-              className="flex-1"
-            >
-              Copy
-            </Button>
+      {/* ── Use Day modal ── */}
+      {useDayTarget && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-slate-800 rounded-2xl border border-slate-700 p-5 space-y-4">
+            <div>
+              <h2 className="text-white font-bold text-lg">
+                {useDayTarget.name}
+              </h2>
+              <p className="text-slate-400 text-sm">
+                {useDayTarget.weekTemplateName} ·{" "}
+                {useDayTarget.exercises.length} exercise
+                {useDayTarget.exercises.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+            <div>
+              <label className="block text-slate-400 text-xs mb-1.5">
+                Workout date
+              </label>
+              <input
+                type="date"
+                value={useDayDate}
+                onChange={(e) => setUseDayDate(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setUseDayTarget(null)}
+                disabled={creatingFromDay}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleUseDay}
+                disabled={creatingFromDay || !useDayDate}
+              >
+                {creatingFromDay ? "Creating…" : "Start Workout"}
+              </Button>
+            </div>
           </div>
         </div>
-      </Modal>
+      )}
 
-      {/* Use Workout Template Modal */}
-      <Modal
-        isOpen={showUseModal}
-        onClose={() => {
-          setShowUseModal(false);
-          setSelectedTemplate(null);
-        }}
-        title="Start Workout"
-      >
-        <div className="space-y-4">
-          <p className="text-slate-300">
-            Create a new workout from &quot;{selectedTemplate?.name}&quot;
-          </p>
-          <Input
-            label="Workout Date"
-            type="date"
-            value={workoutDate}
-            onChange={setWorkoutDate}
-            required
-          />
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => setShowUseModal(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleUseTemplate} className="flex-1">
-              Start Workout
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Delete Workout Template */}
-      <ConfirmDialog
-        isOpen={deleteConfirm !== null}
-        title="Delete Template"
-        message={`Are you sure you want to delete "${deleteConfirm?.name}"? This cannot be undone.`}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        isDestructive={true}
-        onConfirm={handleDeleteWorkout}
-        onCancel={() => setDeleteConfirm(null)}
-      />
-
-      {/* Delete Weekly Template */}
+      {/* ── Delete weekly plan ── */}
       <ConfirmDialog
         isOpen={!!weekDeleteTarget}
         title="Delete Weekly Plan"
-        message={`Delete "${weekDeleteTarget?.name}"? This cannot be undone.`}
+        message={`Delete "${weekDeleteTarget?.name}"? All days in this plan will also be removed from the Daily tab. This cannot be undone.`}
         confirmLabel="Delete"
         cancelLabel="Cancel"
         isDestructive
@@ -617,12 +527,12 @@ export function TemplatesScreen() {
         onCancel={() => setWeekDeleteTarget(null)}
       />
 
-      {/* Generate Week Confirmation */}
+      {/* ── Generate week ── */}
       <ConfirmDialog
         isOpen={!!weekGenerateTarget}
         title="Generate This Week"
-        message={`This will create workouts for the current week from "${weekGenerateTarget?.name}". Continue?`}
-        confirmLabel={generatingWeek ? "Generating..." : "Generate"}
+        message={`This will create workouts for the current (or next) week from "${weekGenerateTarget?.name}". Continue?`}
+        confirmLabel={generatingWeek ? "Generating…" : "Generate"}
         cancelLabel="Cancel"
         isDestructive={false}
         onConfirm={handleWeekGenerate}

@@ -11,7 +11,6 @@ import { WorkoutDetailScreen } from "@/screens/WorkoutDetailScreen";
 import { AddWorkoutScreen } from "@/screens/AddWorkoutScreen";
 import { ExercisesScreen } from "@/screens/ExercisesScreen";
 import { TemplatesScreen } from "@/screens/TemplatesScreen";
-import { AddEditTemplateScreen } from "@/screens/AddEditTemplateScreen";
 import { GoalsScreen } from "@/screens/GoalsScreen";
 import { AnalyticsScreen } from "@/screens/AnalyticsScreen";
 import { EditWeekTemplateScreen } from "@/screens/EditWeekTemplateScreen";
@@ -152,18 +151,7 @@ function App() {
               path="/templates"
               element={user ? <TemplatesScreen /> : <Navigate to="/login" />}
             />
-            <Route
-              path="/templates/new"
-              element={
-                user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
-              }
-            />
-            <Route
-              path="/templates/:templateId/edit"
-              element={
-                user ? <AddEditTemplateScreen /> : <Navigate to="/login" />
-              }
-            />
+
             <Route
               path="/goals"
               element={user ? <GoalsScreen /> : <Navigate to="/login" />}
