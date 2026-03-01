@@ -240,12 +240,21 @@ export function TemplatesScreen() {
         title="Templates"
         onBack={() => navigate("/")}
         action={
-          activeTab === "weekly" ? (
-            <Button onClick={() => setShowWeekCreate(true)}>
-              <Plus className="w-4 h-4 inline mr-1" />
-              New
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => navigate("/exercises")}
+              className="text-xs px-2 py-1"
+            >
+              Exercises
             </Button>
-          ) : undefined
+            {activeTab === "weekly" && (
+              <Button onClick={() => setShowWeekCreate(true)}>
+                <Plus className="w-4 h-4 inline mr-1" />
+                New
+              </Button>
+            )}
+          </div>
         }
       />
       <Breadcrumbs

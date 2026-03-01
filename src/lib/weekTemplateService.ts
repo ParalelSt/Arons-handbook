@@ -97,6 +97,8 @@ export async function saveWeekTemplateFull(
   templateName: string,
   days: SaveDayInput[],
 ): Promise<void> {
+  const userId = await getAuthUserId();
+
   // 1. Update template name
   const { error: nameErr } = await supabase
     .from("week_templates")
@@ -140,7 +142,12 @@ export async function saveWeekTemplateFull(
     }
 
     for (const exercise of day.exercises) {
-      // Insert exercise
+      // Sync to exercise library so Exercises tab stays up-to-date
+      if (exercise.name.trim()) {
+        await findOrCreateExercise(userId, exercise.name.trim());
+      }
+
+      // Insert exercise into template hierarchy
       const { data: exRow, error: exErr } = await supabase
         .from("exercise_templates")
         .insert({ day_template_id: dayRow.id, name: exercise.name })
