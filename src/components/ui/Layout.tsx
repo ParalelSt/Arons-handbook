@@ -114,7 +114,7 @@ export function Button({
       disabled={disabled}
       aria-label={ariaLabel}
       className={cn(
-        "px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base",
+        "inline-flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         variantClass,
         className,
