@@ -42,6 +42,9 @@ const ALL_DAYS = [
 // ─── Local form state ─────────────────────────────────────────────────────────
 
 interface FormDay {
+  /** Original day-of-week used for toggle tracking and sort order */
+  dayKey: string;
+  /** Editable display/session name saved to DB (e.g. "Push", "Pull", "Legs") */
   name: string;
   exercises: FormExercise[];
 }
@@ -74,6 +77,9 @@ export function EditWeekTemplateScreen() {
       setTemplateName(data.name);
 
       const formDays: FormDay[] = (data.day_templates ?? []).map((d) => ({
+        // Best-effort: if the stored name is a day-of-week, use it as the key
+        // so the toggle grid highlights correctly. Otherwise fall back to name.
+        dayKey: (ALL_DAYS as readonly string[]).includes(d.name) ? d.name : d.name,
         name: d.name,
         exercises: (d.exercise_templates ?? []).map((ex) => ({
           clientId: crypto.randomUUID(),
@@ -101,21 +107,27 @@ export function EditWeekTemplateScreen() {
 
   // ─── Day toggles ─────────────────────────────────────────────────────────────
 
-  const activeDayNames = new Set(days.map((d) => d.name));
+  const activeDayKeys = new Set(days.map((d) => d.dayKey));
 
   function toggleDay(dayName: string) {
-    if (activeDayNames.has(dayName)) {
-      setDays((prev) => prev.filter((d) => d.name !== dayName));
+    if (activeDayKeys.has(dayName)) {
+      setDays((prev) => prev.filter((d) => d.dayKey !== dayName));
     } else {
       setDays((prev) => {
-        const updated = [...prev, { name: dayName, exercises: [] }];
+        const updated = [...prev, { dayKey: dayName, name: dayName, exercises: [] }];
         return updated.sort(
           (a, b) =>
-            ALL_DAYS.indexOf(a.name as (typeof ALL_DAYS)[number]) -
-            ALL_DAYS.indexOf(b.name as (typeof ALL_DAYS)[number]),
+            ALL_DAYS.indexOf(a.dayKey as (typeof ALL_DAYS)[number]) -
+            ALL_DAYS.indexOf(b.dayKey as (typeof ALL_DAYS)[number]),
         );
       });
     }
+  }
+
+  function updateDayName(dayIndex: number, name: string) {
+    setDays((prev) =>
+      prev.map((d, i) => (i === dayIndex ? { ...d, name } : d)),
+    );
   }
 
   function updateDayExercises(dayIndex: number, exercises: FormExercise[]) {
@@ -196,7 +208,7 @@ export function EditWeekTemplateScreen() {
     }
 
     const cleanDays: SaveDayInput[] = validDays.map((d) => ({
-      name: d.name,
+      name: d.name.trim() || d.dayKey,
       exercises: d.exercises
         .filter((ex) => ex.name.trim() && ex.sets.length > 0)
         .map(
@@ -294,7 +306,7 @@ export function EditWeekTemplateScreen() {
           </label>
           <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
             {ALL_DAYS.map((day) => {
-              const active = activeDayNames.has(day);
+              const active = activeDayKeys.has(day);
               return (
                 <button
                   key={day}
@@ -319,14 +331,19 @@ export function EditWeekTemplateScreen() {
 
         {/* ── Day cards ───────────────────────────────────── */}
         {days.map((day, dayIndex) => (
-          <Card key={day.name} className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-primary font-semibold text-base">{day.name}</h3>
+          <Card key={day.dayKey} className="p-4">
+            <div className="flex items-center justify-between mb-3 gap-2">
+              <input
+                value={day.name}
+                onChange={(e) => updateDayName(dayIndex, e.target.value)}
+                placeholder={day.dayKey}
+                className="flex-1 min-w-0 bg-transparent text-primary font-semibold text-base focus:outline-none border-b border-transparent focus:border-accent transition-colors placeholder:text-muted"
+              />
               {day.exercises.length > 0 && (
                 <button
                   onClick={() => setSaveToDayLibraryIndex(dayIndex)}
                   aria-label={`Save ${day.name} to library`}
-                  className="p-1.5 text-muted hover:text-accent hover:bg-accent-soft rounded-lg transition-colors"
+                  className="p-1.5 text-muted hover:text-accent hover:bg-accent-soft rounded-lg transition-colors shrink-0"
                   title="Save day to library"
                 >
                   <BookmarkPlus className="w-4 h-4" />
