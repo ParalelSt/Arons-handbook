@@ -50,19 +50,19 @@ export function ExerciseProgress({
 
   const trendColor =
     comparison.trend === "up"
-      ? "text-green-400"
+      ? "text-success"
       : comparison.trend === "down"
-        ? "text-red-400"
-        : "text-slate-400";
+        ? "text-danger"
+        : "text-muted";
 
   return (
-    <div className="mt-2 pt-2 border-t border-slate-700/50">
-      <p className="text-xs text-slate-500">
+    <div className="mt-2 pt-2 border-t border-primary">
+      <p className="text-xs text-muted">
         Previous:{" "}
-        <span className="text-slate-400">
+        <span className="text-secondary">
           {comparison.previousReps} reps @ {comparison.previousWeight}kg
         </span>{" "}
-        <span className="text-slate-600">({comparison.previousWeekDay})</span>{" "}
+        <span className="text-muted">({comparison.previousWeekDay})</span>{" "}
         <span className={trendColor}>{trendIcon}</span>
       </p>
     </div>

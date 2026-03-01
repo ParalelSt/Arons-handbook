@@ -105,7 +105,7 @@ export function Button({
       ? "bg-accent-primary hover:bg-accent text-primary"
       : variant === "secondary"
         ? "bg-elevated hover:bg-elevated text-primary"
-        : "bg-red-700 hover:bg-red-800 text-white";
+        : "bg-danger text-primary";
 
   return (
     <button

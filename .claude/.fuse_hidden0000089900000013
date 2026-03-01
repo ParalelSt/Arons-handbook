@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"/run/media/aron/60025F23025EFE0A/Users/arond/Desktop/Useful app projects/logbook/.env\"*)",
+      "Bash(git add .env.example src/App.tsx src/components/ui/Layout.tsx src/lib/api.ts src/lib/templates.ts src/screens/EditWeekTemplateScreen.tsx src/screens/HomeScreen.tsx src/screens/WeekDetailScreen.tsx src/screens/WorkoutDetailScreen.tsx src/types/index.ts src/components/ui/DayEditorPanel.tsx src/components/ui/SkeletonCard.tsx src/screens/EditWorkoutDayScreen.tsx src/screens/OnboardingScreen.tsx CLAUDE_GUIDE.txt)",
+      "Bash(git commit:*)",
+      "Bash(git add index.html)",
+      "Bash(git push)",
+      "Bash(git push origin main)",
+      "Bash(npm run build)",
+      "Bash(git add src/screens/WorkoutDetailScreen.tsx)",
+      "Bash(git add src/components/ui/DayEditorPanel.tsx)",
+      "Bash(git add src/screens/EditWorkoutDayScreen.tsx)",
+      "Bash(git add src/screens/AddWorkoutScreen.tsx)"
+    ]
+  }
+}

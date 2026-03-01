@@ -117,6 +117,10 @@ body {
   .bg-accent-soft       { background-color: var(--accent-soft); }
   .bg-danger-surface    { background-color: var(--surface-danger); }
   .bg-success-surface   { background-color: var(--surface-success); }
+  .bg-danger            { background-color: var(--danger); }
+  .bg-success           { background-color: var(--success); }
+  .bg-warning           { background-color: var(--warning); }
+  .bg-muted             { background-color: var(--text-muted); }
 
   /* Hover backgrounds */
   .hover\:bg-card:hover     { background-color: var(--surface-secondary); }

@@ -46,9 +46,9 @@ export function GoalsScreen() {
         goalsMap[goal.exercise_id] = goal;
       });
       setGoals(goalsMap);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to load goals");
+      setError(err instanceof Error ? err.message : 'Failed to load goals');
     } finally {
       setLoading(false);
     }
@@ -94,9 +94,9 @@ export function GoalsScreen() {
 
       setEdited(new Set());
       setSuccess("Goals saved successfully!");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to save goals");
+      setError(err instanceof Error ? err.message : 'Failed to save goals');
     } finally {
       setSaving(false);
     }
@@ -117,9 +117,9 @@ export function GoalsScreen() {
       newEdited.delete(deleteConfirm);
       setEdited(newEdited);
       setDeleteConfirm(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to delete goal");
+      setError(err instanceof Error ? err.message : 'Failed to delete goal');
       setDeleteConfirm(null);
     }
   }
@@ -129,7 +129,7 @@ export function GoalsScreen() {
       <Container>
         <Header title="Loading..." onBack={() => navigate("/")} />
         <div className="text-center py-12">
-          <div className="text-slate-400">Loading goals...</div>
+          <div className="text-muted">Loading goals...</div>
         </div>
       </Container>
     );
@@ -165,7 +165,7 @@ export function GoalsScreen() {
 
         {exercises.length === 0 ? (
           <Card className="p-8 text-center">
-            <p className="text-slate-400 mb-4">No exercises yet</p>
+            <p className="text-muted mb-4">No exercises yet</p>
             <Button onClick={() => navigate("/exercises")}>
               Create Exercises First
             </Button>
@@ -173,7 +173,7 @@ export function GoalsScreen() {
         ) : (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h2 className="text-lg font-semibold text-white">Your Goals</h2>
+              <h2 className="text-lg font-semibold text-primary">Your Goals</h2>
               <div className="flex gap-2">
                 <Button
                   variant="secondary"
@@ -186,7 +186,7 @@ export function GoalsScreen() {
 
             {Object.keys(goals).length === 0 ? (
               <Card className="p-6 text-center">
-                <p className="text-slate-400 mb-3">No goals yet.</p>
+                <p className="text-muted mb-3">No goals yet.</p>
                 <Button onClick={() => setShowAddModal(true)}>
                   Add Your First Goal
                 </Button>
@@ -206,14 +206,14 @@ export function GoalsScreen() {
                   .map(({ id, exercise, goal }) => (
                     <Card key={id} className="p-4 sm:p-5">
                       <div className="flex items-start justify-between mb-4 gap-2">
-                        <h3 className="text-base sm:text-lg font-semibold text-white truncate">
+                        <h3 className="text-base sm:text-lg font-semibold text-primary truncate">
                           {exercise?.name}
                         </h3>
                         <button
                           onClick={() => setDeleteConfirm(id)}
-                          className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                          className="p-2 hover:bg-elevated rounded-lg transition-colors"
                         >
-                          <Trash2 className="w-4 h-4 text-slate-400" />
+                          <Trash2 className="w-4 h-4 text-muted" />
                         </button>
                       </div>
 
@@ -275,27 +275,27 @@ export function GoalsScreen() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowAddModal(false)}
           />
-          <div className="relative bg-slate-800 rounded-2xl border border-slate-700 max-w-lg w-[95%] sm:w-full max-h-[80vh] overflow-y-auto mx-auto my-auto p-4 sm:p-6">
+          <div className="relative bg-floating rounded-2xl border border-primary max-w-lg w-[95%] sm:w-full max-h-[80vh] overflow-y-auto mx-auto my-auto p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Add Goal</h2>
+              <h2 className="text-lg font-semibold text-primary">Add Goal</h2>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-elevated rounded-lg transition-colors"
               >
-                <span className="text-slate-400">✕</span>
+                <span className="text-muted">✕</span>
               </button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs sm:text-sm font-medium text-slate-300">
+                <label className="text-xs sm:text-sm font-medium text-secondary">
                   Search exercises
                 </label>
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Type to search"
-                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full mt-1 px-3 py-2 rounded-lg bg-elevated border border-primary text-primary placeholder-muted focus:outline-none focus:ring-2 focus:ring-(--border-focus)"
                 />
               </div>
 
@@ -317,9 +317,9 @@ export function GoalsScreen() {
                         setShowAddModal(false);
                         setSearch("");
                       }}
-                      className="w-full text-left p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-700 hover:border-slate-600 transition-all"
+                      className="w-full text-left p-3 rounded-lg bg-elevated hover:bg-surface border border-primary hover:border-secondary transition-all"
                     >
-                      <p className="text-white font-medium">{exercise.name}</p>
+                      <p className="text-primary font-medium">{exercise.name}</p>
                     </button>
                   ))}
 
@@ -328,7 +328,7 @@ export function GoalsScreen() {
                   .filter((ex) =>
                     ex.name.toLowerCase().includes(search.toLowerCase())
                   ).length === 0 && (
-                  <p className="text-slate-500 text-sm text-center py-6">
+                  <p className="text-muted text-sm text-center py-6">
                     No exercises available.
                   </p>
                 )}

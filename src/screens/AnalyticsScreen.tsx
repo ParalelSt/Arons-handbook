@@ -141,10 +141,10 @@ export function AnalyticsScreen() {
 
   function TrendIcon({ value }: { value: number }) {
     if (value > 0)
-      return <TrendingUp className="w-4 h-4 text-green-400 inline" />;
+      return <TrendingUp className="w-4 h-4 text-success inline" />;
     if (value < 0)
-      return <TrendingDown className="w-4 h-4 text-red-400 inline" />;
-    return <Minus className="w-4 h-4 text-slate-400 inline" />;
+      return <TrendingDown className="w-4 h-4 text-danger inline" />;
+    return <Minus className="w-4 h-4 text-muted inline" />;
   }
 
   // ─── Loading state ──────────────────────────────────────────────────────────
@@ -154,7 +154,7 @@ export function AnalyticsScreen() {
       <Container>
         <Header title="Analytics" onBack={() => navigate("/")} />
         <div className="text-center py-12">
-          <div className="text-slate-400">Loading analytics...</div>
+          <div className="text-muted">Loading analytics...</div>
         </div>
       </Container>
     );
@@ -176,9 +176,9 @@ export function AnalyticsScreen() {
           ]}
         />
         <div className="text-center py-16 px-4">
-          <BarChart3 className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-          <h2 className="text-xl text-white mb-2">No workout data yet</h2>
-          <p className="text-slate-400 mb-6 max-w-sm mx-auto">
+          <BarChart3 className="w-12 h-12 text-muted mx-auto mb-4" />
+          <h2 className="text-xl text-primary mb-2">No workout data yet</h2>
+          <p className="text-muted mb-6 max-w-sm mx-auto">
             Log some workouts to see your strength progress, volume trends, and
             personal records here.
           </p>
@@ -210,8 +210,8 @@ export function AnalyticsScreen() {
         {/* ─── Strength Progress ─────────────────────────────── */}
         <Card className="p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
-            <h2 className="text-lg font-semibold text-white">
+            <TrendingUp className="w-5 h-5 text-accent" />
+            <h2 className="text-lg font-semibold text-primary">
               Strength Progress
             </h2>
           </div>
@@ -221,7 +221,7 @@ export function AnalyticsScreen() {
               <select
                 value={selectedExercise}
                 onChange={(e) => setSelectedExercise(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 rounded-lg bg-elevated border border-primary text-primary text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-(--border-focus) focus:border-transparent"
               >
                 {exerciseNames.map((name) => (
                   <option key={name} value={name}>
@@ -234,24 +234,24 @@ export function AnalyticsScreen() {
                 <div className="h-52 sm:h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={strengthData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" />
                       <XAxis
                         dataKey="date"
                         tickFormatter={formatChartDate}
-                        stroke="#64748b"
+                        stroke="var(--text-muted)"
                         tick={{ fontSize: 11 }}
                       />
                       <YAxis
-                        stroke="#64748b"
+                        stroke="var(--text-muted)"
                         tick={{ fontSize: 11 }}
                         unit="kg"
                       />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: "#1e293b",
-                          border: "1px solid #475569",
+                          backgroundColor: "var(--surface-floating)",
+                          border: "1px solid var(--border-primary)",
                           borderRadius: "8px",
-                          color: "#fff",
+                          color: "var(--text-primary)",
                           fontSize: "13px",
                         }}
                         labelFormatter={(label) =>
@@ -262,22 +262,22 @@ export function AnalyticsScreen() {
                       <Line
                         type="monotone"
                         dataKey="value"
-                        stroke="#3b82f6"
+                        stroke="var(--accent-primary)"
                         strokeWidth={2}
-                        dot={{ fill: "#3b82f6", r: 3 }}
+                        dot={{ fill: "var(--accent-primary)", r: 3 }}
                         activeDot={{ r: 5 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <p className="text-slate-500 text-sm text-center py-8">
+                <p className="text-muted text-sm text-center py-8">
                   Not enough data for this exercise yet.
                 </p>
               )}
             </>
           ) : (
-            <p className="text-slate-500 text-sm text-center py-8">
+            <p className="text-muted text-sm text-center py-8">
               Log some workouts to see strength progress.
             </p>
           )}
@@ -286,28 +286,28 @@ export function AnalyticsScreen() {
         {/* ─── Volume Trends ─────────────────────────────────── */}
         <Card className="p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-5 h-5 text-purple-400" />
-            <h2 className="text-lg font-semibold text-white">Volume Trends</h2>
+            <BarChart3 className="w-5 h-5 text-accent" />
+            <h2 className="text-lg font-semibold text-primary">Volume Trends</h2>
           </div>
 
           {volumeData.length > 1 ? (
             <div className="h-52 sm:h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={volumeData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" />
                   <XAxis
                     dataKey="weekStart"
                     tickFormatter={formatChartDate}
-                    stroke="#64748b"
+                    stroke="var(--text-muted)"
                     tick={{ fontSize: 11 }}
                   />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#1e293b",
-                      border: "1px solid #475569",
+                      backgroundColor: "var(--surface-floating)",
+                      border: "1px solid var(--border-primary)",
                       borderRadius: "8px",
-                      color: "#fff",
+                      color: "var(--text-primary)",
                       fontSize: "13px",
                     }}
                     labelFormatter={(label) => formatChartDate(String(label))}
@@ -318,14 +318,14 @@ export function AnalyticsScreen() {
                   />
                   <Bar
                     dataKey="totalVolume"
-                    fill="#a855f7"
+                    fill="var(--accent-primary)"
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           ) : (
-            <p className="text-slate-500 text-sm text-center py-8">
+            <p className="text-muted text-sm text-center py-8">
               Log workouts across multiple weeks to see volume trends.
             </p>
           )}
@@ -334,13 +334,13 @@ export function AnalyticsScreen() {
         {/* ─── Weekly Comparison ──────────────────────────────── */}
         {weekComparison && (
           <Card className="p-4 sm:p-5">
-            <h2 className="text-lg font-semibold text-white mb-4">
+            <h2 className="text-lg font-semibold text-primary mb-4">
               Weekly Comparison
             </h2>
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center">
-                <p className="text-slate-500 text-xs mb-1">Volume</p>
-                <p className="text-white font-semibold text-sm">
+                <p className="text-muted text-xs mb-1">Volume</p>
+                <p className="text-primary font-semibold text-sm">
                   {weekComparison.current.totalVolume.toLocaleString()} kg
                 </p>
                 <p className="text-xs mt-1">
@@ -348,8 +348,8 @@ export function AnalyticsScreen() {
                   <span
                     className={
                       weekComparison.volumeChange >= 0
-                        ? "text-green-400"
-                        : "text-red-400"
+                        ? "text-success"
+                        : "text-danger"
                     }
                   >
                     {weekComparison.volumeChange >= 0 ? "+" : ""}
@@ -358,8 +358,8 @@ export function AnalyticsScreen() {
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-slate-500 text-xs mb-1">Sets</p>
-                <p className="text-white font-semibold text-sm">
+                <p className="text-muted text-xs mb-1">Sets</p>
+                <p className="text-primary font-semibold text-sm">
                   {weekComparison.current.totalSets}
                 </p>
                 <p className="text-xs mt-1">
@@ -367,8 +367,8 @@ export function AnalyticsScreen() {
                   <span
                     className={
                       weekComparison.setsChange >= 0
-                        ? "text-green-400"
-                        : "text-red-400"
+                        ? "text-success"
+                        : "text-danger"
                     }
                   >
                     {weekComparison.setsChange >= 0 ? "+" : ""}
@@ -377,8 +377,8 @@ export function AnalyticsScreen() {
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-slate-500 text-xs mb-1">Exercises</p>
-                <p className="text-white font-semibold text-sm">
+                <p className="text-muted text-xs mb-1">Exercises</p>
+                <p className="text-primary font-semibold text-sm">
                   {weekComparison.current.totalExercises}
                 </p>
                 <p className="text-xs mt-1">
@@ -386,8 +386,8 @@ export function AnalyticsScreen() {
                   <span
                     className={
                       weekComparison.exercisesChange >= 0
-                        ? "text-green-400"
-                        : "text-red-400"
+                        ? "text-success"
+                        : "text-danger"
                     }
                   >
                     {weekComparison.exercisesChange >= 0 ? "+" : ""}
@@ -418,8 +418,8 @@ export function AnalyticsScreen() {
               {goalsWithTargetWeight.length > 0 && (
                 <Card className="p-4 sm:p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <Target className="w-5 h-5 text-blue-400" />
-                    <h2 className="text-lg font-semibold text-white">
+                    <Target className="w-5 h-5 text-accent" />
+                    <h2 className="text-lg font-semibold text-primary">
                       Goal Progress
                     </h2>
                   </div>
@@ -443,16 +443,16 @@ export function AnalyticsScreen() {
                           key={goal.id}
                           className={`rounded-lg p-3 ${
                             achieved
-                              ? "bg-yellow-500/10 border border-yellow-500/30"
-                              : "bg-slate-900/50"
+                              ? "bg-elevated border border-primary"
+                              : "bg-elevated"
                           }`}
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               {achieved && (
-                                <Trophy className="w-4 h-4 text-yellow-400" />
+                                <Trophy className="w-4 h-4 text-warning" />
                               )}
-                              <p className="text-white font-medium text-sm">
+                              <p className="text-primary font-medium text-sm">
                                 {exerciseName}
                               </p>
                             </div>
@@ -460,13 +460,13 @@ export function AnalyticsScreen() {
                               <span
                                 className={
                                   achieved
-                                    ? "text-yellow-400 font-semibold"
-                                    : "text-white"
+                                    ? "text-warning font-semibold"
+                                    : "text-primary"
                                 }
                               >
                                 {currentBest} kg
                               </span>
-                              <span className="text-slate-500">
+                              <span className="text-muted">
                                 {" "}
                                 / {target} kg
                               </span>
@@ -474,26 +474,26 @@ export function AnalyticsScreen() {
                           </div>
 
                           {/* Progress bar */}
-                          <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                          <div className="w-full h-2 bg-elevated rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
                                 achieved
-                                  ? "bg-yellow-400"
+                                  ? "bg-warning"
                                   : pct >= 75
-                                    ? "bg-green-400"
+                                    ? "bg-success"
                                     : pct >= 50
-                                      ? "bg-blue-400"
-                                      : "bg-slate-400"
+                                      ? "bg-accent-primary"
+                                      : "bg-muted"
                               }`}
                               style={{ width: `${pct}%` }}
                             />
                           </div>
                           <div className="flex justify-between mt-1">
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted">
                               {achieved ? "Goal reached!" : `${pct}% of target`}
                             </p>
                             {matchingPR && (
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-muted">
                                 PR:{" "}
                                 {format(
                                   parseISO(matchingPR.best_date),
@@ -512,8 +512,8 @@ export function AnalyticsScreen() {
               {/* Other Personal Records (no goal set) */}
               <Card className="p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-5 h-5 text-yellow-400" />
-                  <h2 className="text-lg font-semibold text-white">
+                  <Trophy className="w-5 h-5 text-warning" />
+                  <h2 className="text-lg font-semibold text-primary">
                     Personal Records
                   </h2>
                 </div>
@@ -523,18 +523,18 @@ export function AnalyticsScreen() {
                     {prsWithoutGoals.slice(0, 20).map((pr) => (
                       <div
                         key={pr.exercise_name}
-                        className="flex items-center justify-between bg-slate-900/50 rounded-lg p-3"
+                        className="flex items-center justify-between bg-elevated rounded-lg p-3"
                       >
                         <div>
-                          <p className="text-white font-medium text-sm">
+                          <p className="text-primary font-medium text-sm">
                             {pr.exercise_name}
                           </p>
-                          <p className="text-slate-500 text-xs">
+                          <p className="text-muted text-xs">
                             {format(parseISO(pr.best_date), "MMM d, yyyy")}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-yellow-400 font-semibold text-sm">
+                          <p className="text-warning font-semibold text-sm">
                             {pr.max_weight} kg
                           </p>
                         </div>
@@ -542,11 +542,11 @@ export function AnalyticsScreen() {
                     ))}
                   </div>
                 ) : prs.length > 0 ? (
-                  <p className="text-slate-500 text-sm text-center py-4">
+                  <p className="text-muted text-sm text-center py-4">
                     All your records are tracked under Goal Progress above!
                   </p>
                 ) : (
-                  <p className="text-slate-500 text-sm text-center py-8">
+                  <p className="text-muted text-sm text-center py-8">
                     No personal records yet. Keep training!
                   </p>
                 )}
