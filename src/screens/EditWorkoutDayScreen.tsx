@@ -199,7 +199,7 @@ export function EditWorkoutDayScreen() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-28 bg-slate-800/50 rounded-xl border border-slate-700/50 animate-pulse"
+              className="h-28 bg-card rounded-xl border border-primary animate-pulse"
             />
           ))}
         </div>
@@ -242,9 +242,9 @@ export function EditWorkoutDayScreen() {
         <Card className="p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-white font-semibold text-base">{dayName}</h3>
+              <h3 className="text-primary font-semibold text-base">{dayName}</h3>
               {workoutDate && (
-                <p className="text-slate-500 text-xs mt-0.5">
+                <p className="text-muted text-xs mt-0.5">
                   {format(parseISO(workoutDate), "MMMM d, yyyy")}
                 </p>
               )}
@@ -253,7 +253,7 @@ export function EditWorkoutDayScreen() {
               <button
                 onClick={() => setSaveToLibraryConfirm(true)}
                 aria-label={`Save ${dayName} to library`}
-                className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                className="p-1.5 text-muted hover:text-accent hover:bg-accent-soft rounded-lg transition-colors"
                 title="Save day to library"
               >
                 <BookmarkPlus className="w-4 h-4" />

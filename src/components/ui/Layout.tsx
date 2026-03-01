@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
-import { getTheme } from "@/lib/theme";
 import { ThemeSelector } from "./ThemeSelector";
 
 interface ContainerProps {
@@ -10,16 +8,8 @@ interface ContainerProps {
 }
 
 export function Container({ children, className }: ContainerProps) {
-  const { currentTheme } = useTheme();
-  const theme = getTheme(currentTheme);
-
   return (
-    <div
-      className={cn(
-        `min-h-screen bg-linear-to-br ${theme.colors.bg.gradient}`,
-        className
-      )}
-    >
+    <div className={cn("min-h-screen bg-surface", className)}>
       {children}
     </div>
   );
@@ -32,21 +22,18 @@ interface HeaderProps {
 }
 
 export function Header({ title, onBack, action }: HeaderProps) {
-  const { currentTheme } = useTheme();
-  const theme = getTheme(currentTheme);
-
   return (
-    <header className={`${theme.colors.header.bg} backdrop-blur-sm border-b ${theme.colors.header.border} sticky top-0 z-10`}>
+    <header className="bg-card border-b border-primary sticky top-0 z-10">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onBack && (
             <button
               onClick={onBack}
-              className="p-2 hover:bg-slate-700 rounded-lg transition-colors shrink-0"
+              className="p-2 hover:bg-elevated rounded-lg transition-colors shrink-0"
               aria-label="Go back"
             >
               <svg
-                className="w-5 h-5 text-slate-300"
+                className="w-5 h-5 text-secondary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -60,7 +47,7 @@ export function Header({ title, onBack, action }: HeaderProps) {
               </svg>
             </button>
           )}
-          <h1 className="text-lg sm:text-xl font-bold text-white truncate">
+          <h1 className="text-lg sm:text-xl font-bold text-primary truncate">
             {title}
           </h1>
         </div>
@@ -80,16 +67,12 @@ interface CardProps {
 }
 
 export function Card({ children, className, onClick }: CardProps) {
-  const { currentTheme } = useTheme();
-  const theme = getTheme(currentTheme);
-
   return (
     <div
       className={cn(
-        `${theme.colors.bg.card} backdrop-blur-sm rounded-xl border ${theme.colors.border.primary}`,
-        `${theme.colors.border.light} transition-all duration-200`,
-        onClick && `cursor-pointer ${theme.colors.bg.cardHover}`,
-        className
+        "bg-card rounded-xl border border-primary transition-colors duration-200",
+        onClick && "cursor-pointer hover:bg-elevated",
+        className,
       )}
       onClick={onClick}
     >
@@ -117,14 +100,12 @@ export function Button({
   disabled = false,
   "aria-label": ariaLabel,
 }: ButtonProps) {
-  const { currentTheme } = useTheme();
-  const theme = getTheme(currentTheme);
-
-  const variants = {
-    primary: theme.colors.button.primary,
-    secondary: theme.colors.button.secondary,
-    danger: "bg-red-600 hover:bg-red-700 text-white",
-  };
+  const variantClass =
+    variant === "primary"
+      ? "bg-accent-primary hover:bg-accent text-primary"
+      : variant === "secondary"
+        ? "bg-elevated hover:bg-elevated text-primary"
+        : "bg-red-700 hover:bg-red-800 text-white";
 
   return (
     <button
@@ -135,8 +116,8 @@ export function Button({
       className={cn(
         "px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base",
         "disabled:opacity-50 disabled:cursor-not-allowed",
-        variants[variant],
-        className
+        variantClass,
+        className,
       )}
     >
       {children}

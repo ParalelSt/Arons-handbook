@@ -239,7 +239,7 @@ export function EditWeekTemplateScreen() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-28 bg-slate-800/50 rounded-xl border border-slate-700/50 animate-pulse"
+              className="h-28 bg-card rounded-xl border border-primary animate-pulse"
             />
           ))}
         </div>
@@ -289,7 +289,7 @@ export function EditWeekTemplateScreen() {
 
         {/* ── Day selector grid ───────────────────────────── */}
         <Card className="p-4">
-          <label className="block text-sm font-medium text-slate-400 mb-3">
+          <label className="block text-sm font-medium text-secondary mb-3">
             Training Days
           </label>
           <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
@@ -303,8 +303,8 @@ export function EditWeekTemplateScreen() {
                   aria-label={day}
                   className={`px-1 sm:px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                     active
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                      : "bg-slate-800 text-slate-500 hover:bg-slate-700 hover:text-slate-300"
+                      ? "bg-accent-primary text-primary shadow-lg"
+                      : "bg-elevated text-muted hover:bg-elevated hover:text-secondary"
                   }`}
                 >
                   {day.slice(0, 3)}
@@ -312,7 +312,7 @@ export function EditWeekTemplateScreen() {
               );
             })}
           </div>
-          <p className="text-slate-600 text-xs mt-2">
+          <p className="text-muted text-xs mt-2">
             {days.length} day{days.length !== 1 ? "s" : ""} selected
           </p>
         </Card>
@@ -321,12 +321,12 @@ export function EditWeekTemplateScreen() {
         {days.map((day, dayIndex) => (
           <Card key={day.name} className="p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-white font-semibold text-base">{day.name}</h3>
+              <h3 className="text-primary font-semibold text-base">{day.name}</h3>
               {day.exercises.length > 0 && (
                 <button
                   onClick={() => setSaveToDayLibraryIndex(dayIndex)}
                   aria-label={`Save ${day.name} to library`}
-                  className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                  className="p-1.5 text-muted hover:text-accent hover:bg-accent-soft rounded-lg transition-colors"
                   title="Save day to library"
                 >
                   <BookmarkPlus className="w-4 h-4" />
@@ -345,7 +345,7 @@ export function EditWeekTemplateScreen() {
         {/* No days hint */}
         {days.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-slate-500 text-sm">
+            <p className="text-muted text-sm">
               Select training days above to start building your plan.
             </p>
           </div>

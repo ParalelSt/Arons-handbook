@@ -202,8 +202,8 @@ export function DayImportModal({
   function renderLoading() {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
-        <span className="text-slate-400 ml-2 text-sm">Loading…</span>
+        <Loader2 className="w-5 h-5 text-secondary animate-spin" />
+        <span className="text-secondary ml-2 text-sm">Loading…</span>
       </div>
     );
   }
@@ -211,8 +211,8 @@ export function DayImportModal({
   function renderEmpty(msg: string) {
     return (
       <div className="text-center py-10">
-        <Dumbbell className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-        <p className="text-slate-500 text-sm">{msg}</p>
+        <Dumbbell className="w-10 h-10 text-muted mx-auto mb-3" />
+        <p className="text-muted text-sm">{msg}</p>
       </div>
     );
   }
@@ -228,10 +228,10 @@ export function DayImportModal({
           <button
             key={day.id}
             onClick={() => importFromLibrary(day)}
-            className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors"
+            className="w-full text-left px-3 py-3 rounded-lg hover:bg-elevated active:bg-elevated transition-colors"
           >
-            <p className="text-white font-medium text-sm">{day.name}</p>
-            <p className="text-slate-500 text-xs mt-0.5">
+            <p className="text-primary font-medium text-sm">{day.name}</p>
+            <p className="text-muted text-xs mt-0.5">
               {day.day_library_exercises.length} exercise
               {day.day_library_exercises.length !== 1 ? "s" : ""}
               {day.day_library_exercises.length > 0 && (
@@ -258,15 +258,15 @@ export function DayImportModal({
           <button
             key={w.id}
             onClick={() => importFromWorkout(w)}
-            className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors"
+            className="w-full text-left px-3 py-3 rounded-lg hover:bg-elevated active:bg-elevated transition-colors"
           >
             <div className="flex items-center justify-between">
-              <p className="text-white font-medium text-sm">
+              <p className="text-primary font-medium text-sm">
                 {w.title || "Untitled Workout"}
               </p>
-              <p className="text-slate-500 text-xs">{w.date}</p>
+              <p className="text-muted text-xs">{w.date}</p>
             </div>
-            <p className="text-slate-500 text-xs mt-0.5">
+            <p className="text-muted text-xs mt-0.5">
               {w.workout_exercises.length} exercise
               {w.workout_exercises.length !== 1 ? "s" : ""}
             </p>
@@ -287,11 +287,11 @@ export function DayImportModal({
           <div key={t.id}>
             <button
               onClick={() => expandTemplate(t.id)}
-              className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors flex items-center justify-between"
+              className="w-full text-left px-3 py-3 rounded-lg hover:bg-elevated active:bg-elevated transition-colors flex items-center justify-between"
             >
-              <p className="text-white font-medium text-sm">{t.name}</p>
+              <p className="text-primary font-medium text-sm">{t.name}</p>
               <ChevronRight
-                className={`w-4 h-4 text-slate-500 transition-transform ${
+                className={`w-4 h-4 text-muted transition-transform ${
                   expandedTemplate === t.id ? "rotate-90" : ""
                 }`}
               />
@@ -302,10 +302,10 @@ export function DayImportModal({
               <div className="ml-4 mt-1 space-y-1">
                 {loadingTemplateDays ? (
                   <div className="py-3 text-center">
-                    <Loader2 className="w-4 h-4 text-slate-400 animate-spin inline" />
+                    <Loader2 className="w-4 h-4 text-secondary animate-spin inline" />
                   </div>
                 ) : templateDays.length === 0 ? (
-                  <p className="text-slate-500 text-xs py-2 pl-2">
+                  <p className="text-muted text-xs py-2 pl-2">
                     No days in this template.
                   </p>
                 ) : (
@@ -313,10 +313,10 @@ export function DayImportModal({
                     <button
                       key={day.id}
                       onClick={() => importFromTemplateDay(day)}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors border border-slate-700/50"
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-elevated active:bg-elevated transition-colors border border-primary"
                     >
-                      <p className="text-white text-sm">{day.name}</p>
-                      <p className="text-slate-500 text-xs mt-0.5">
+                      <p className="text-primary text-sm">{day.name}</p>
+                      <p className="text-muted text-xs mt-0.5">
                         {day.exercise_templates.length} exercise
                         {day.exercise_templates.length !== 1 ? "s" : ""}
                       </p>
@@ -343,7 +343,7 @@ export function DayImportModal({
     <Modal isOpen={isOpen} onClose={onClose} title="Import Existing Day">
       <div className="space-y-3">
         {/* Tab bar */}
-        <div className="flex gap-1 bg-slate-900/50 rounded-lg p-1">
+        <div className="flex gap-1 bg-elevated rounded-lg p-1">
           {tabs.map((t) => {
             const Icon = t.icon;
             return (
@@ -352,8 +352,8 @@ export function DayImportModal({
                 onClick={() => setTab(t.id)}
                 className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-md text-xs font-medium transition-colors ${
                   tab === t.id
-                    ? "bg-blue-600 text-white"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-accent-primary text-primary"
+                    : "text-secondary hover:text-primary"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

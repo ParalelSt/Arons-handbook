@@ -26,6 +26,21 @@
     <link rel="icon" sizes="192x192" href="/icon-192.png" />
     <link rel="icon" sizes="512x512" href="/icon-512.png" />
     <title>Gym Logbook</title>
+    <script>
+      // Apply theme before React loads to prevent flash of unstyled content
+      (function() {
+        var stored = localStorage.getItem('app-theme');
+        var theme = 'deep-blue';
+        if (stored === 'athletic-red' || stored === 'slate-minimal' || stored === 'deep-blue') {
+          theme = stored;
+        } else if (stored === 'red') {
+          theme = 'athletic-red';
+        } else if (stored === 'slate') {
+          theme = 'slate-minimal';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

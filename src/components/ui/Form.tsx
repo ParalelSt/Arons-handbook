@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
 
 interface InputProps {
   label: string;
@@ -23,21 +22,11 @@ export function Input({
   min,
   step,
 }: InputProps) {
-  const { currentTheme } = useTheme();
-
-  // Map theme colors to focus ring colors
-  const focusRingColor =
-    currentTheme === "blue"
-      ? "focus:ring-blue-500"
-      : currentTheme === "red"
-        ? "focus:ring-red-500"
-        : "focus:ring-slate-500";
-
   return (
     <div className="flex flex-col gap-1.5 sm:gap-2">
-      <label className="text-xs sm:text-sm font-medium text-slate-300 block">
+      <label className="text-xs sm:text-sm font-medium text-secondary block">
         {label}
-        {required && <span className="text-red-400 ml-1">*</span>}
+        {required && <span className="text-danger ml-1">*</span>}
       </label>
       <input
         type={type}
@@ -49,10 +38,9 @@ export function Input({
         step={step}
         className={cn(
           "w-full min-w-0 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base",
-          "bg-slate-900/50 border border-slate-700",
-          "text-white placeholder-slate-500",
-          `focus:outline-none focus:ring-2 ${focusRingColor} focus:border-transparent`,
-          "invalid:ring-0 invalid:border-slate-700",
+          "bg-elevated border border-primary",
+          "text-primary placeholder-muted",
+          "focus:outline-none focus:ring-2 focus:ring-(--border-focus) focus:border-transparent",
           "transition-all",
         )}
       />
@@ -77,7 +65,7 @@ export function TextArea({
 }: TextAreaProps) {
   return (
     <div className="flex flex-col gap-1.5 sm:gap-2">
-      <label className="text-xs sm:text-sm font-medium text-slate-300">
+      <label className="text-xs sm:text-sm font-medium text-secondary">
         {label}
       </label>
       <textarea
@@ -87,9 +75,9 @@ export function TextArea({
         rows={rows}
         className={cn(
           "px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base",
-          "bg-slate-900/50 border border-slate-700",
-          "text-white placeholder-slate-500",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+          "bg-elevated border border-primary",
+          "text-primary placeholder-muted",
+          "focus:outline-none focus:ring-2 focus:ring-(--border-focus) focus:border-transparent",
           "transition-all resize-none",
         )}
       />
@@ -110,18 +98,18 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4">
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-slate-800 rounded-2xl border border-slate-700 max-w-lg w-[95%] sm:w-full max-h-[80vh] sm:max-h-[90vh] overflow-y-auto mx-auto my-auto">
-        <div className="sticky top-0 bg-slate-800 border-b border-slate-700 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-2xl">
-          <h2 className="text-lg sm:text-xl font-bold text-white">{title}</h2>
+      <div className="relative bg-card rounded-2xl border border-primary max-w-lg w-[95%] sm:w-full max-h-[80vh] sm:max-h-[90vh] overflow-y-auto mx-auto my-auto">
+        <div className="sticky top-0 bg-card border-b border-primary px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-2xl">
+          <h2 className="text-lg sm:text-xl font-bold text-primary">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-elevated rounded-lg transition-colors"
           >
             <svg
-              className="w-5 h-5 text-slate-400"
+              className="w-5 h-5 text-muted"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

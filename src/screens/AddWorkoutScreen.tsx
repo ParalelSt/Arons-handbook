@@ -186,7 +186,7 @@ export function AddWorkoutScreen() {
           {/* ── Template quick-start ── */}
           {templates.length > 0 && formExercises.length === 0 && (
             <Card className="p-4">
-              <p className="text-sm font-medium text-slate-400 mb-3">
+              <p className="text-sm font-medium text-secondary mb-3">
                 Quick start from a template
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -198,16 +198,16 @@ export function AddWorkoutScreen() {
                     disabled={loadingTemplateId !== null}
                     className={`text-left p-3 rounded-lg border transition-all text-sm ${
                       loadingTemplateId === t.id
-                        ? "bg-blue-600 border-blue-500 opacity-90"
-                        : "bg-blue-600/10 border-blue-500/30 hover:bg-blue-600/20 hover:border-blue-500/50"
+                        ? "bg-accent-primary border-accent opacity-90"
+                        : "bg-accent-soft border-accent hover:bg-accent-soft hover:border-accent"
                     } ${
                       loadingTemplateId !== null && loadingTemplateId !== t.id
                         ? "opacity-40"
                         : ""
                     }`}
                   >
-                    <p className="font-medium text-white">{t.name}</p>
-                    <p className="text-slate-400 text-xs mt-0.5">
+                    <p className="font-medium text-primary">{t.name}</p>
+                    <p className="text-secondary text-xs mt-0.5">
                       {t.template_exercises.length} exercise
                       {t.template_exercises.length !== 1 ? "s" : ""}
                     </p>
@@ -243,7 +243,7 @@ export function AddWorkoutScreen() {
           {/* ── Day card — same structure as EditWeekTemplateScreen ── */}
           <Card className="p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-white font-semibold text-base">
+              <h3 className="text-primary font-semibold text-base">
                 {dayName || "Exercises"}
               </h3>
             </div>
@@ -265,7 +265,7 @@ export function AddWorkoutScreen() {
           </Button>
 
           {(title || notes || formExercises.length > 0) && (
-            <p className="text-xs text-slate-500 text-center">
+            <p className="text-xs text-muted text-center">
               Draft saved automatically
             </p>
           )}

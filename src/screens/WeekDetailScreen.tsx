@@ -127,23 +127,23 @@ export function WeekDetailScreen() {
                       }
                     >
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="text-lg font-semibold text-primary">
                           {dayName}
                         </h3>
-                        <span className="text-sm text-slate-500">
+                        <span className="text-sm text-muted">
                           {dayDate}
                         </span>
                       </div>
                       <p
                         className={cn(
                           "text-sm",
-                          isRest ? "text-slate-600 italic" : "text-slate-400",
+                          isRest ? "text-muted italic" : "text-secondary",
                         )}
                       >
                         {getDayTitle(day)}
                       </p>
                       {workout && (
-                        <p className="text-xs text-slate-600 mt-1">
+                        <p className="text-xs text-muted mt-1">
                           {workout.workout_exercises.length} exercise
                           {workout.workout_exercises.length !== 1 ? "s" : ""}
                         </p>
@@ -160,7 +160,7 @@ export function WeekDetailScreen() {
                               navigate(`/workout/${workout.id}/edit`)
                             }
                             aria-label={`Edit ${dayName}`}
-                            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                            className="p-2 text-secondary hover:text-accent hover:bg-accent-soft rounded-lg transition-colors"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -170,14 +170,14 @@ export function WeekDetailScreen() {
                               navigate(`/workout/${workout.id}`)
                             }
                             aria-label={`View ${dayName}`}
-                            className="p-2 text-slate-500 hover:text-slate-300 rounded-lg transition-colors"
+                            className="p-2 text-muted hover:text-secondary rounded-lg transition-colors"
                           >
                             <ChevronRight className="w-5 h-5" />
                           </button>
                         </>
                       ) : (
                         <button
-                          className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
+                          className="px-3 py-1.5 bg-elevated hover:bg-elevated text-primary text-sm rounded-lg transition-colors"
                           onClick={() =>
                             navigate(
                               `/workout/new?date=${format(

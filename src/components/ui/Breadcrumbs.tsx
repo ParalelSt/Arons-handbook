@@ -18,8 +18,8 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   return (
     <nav
       className={cn(
-        "px-3 sm:px-4 py-2 bg-slate-900/60 border-b border-slate-700",
-        "overflow-x-auto whitespace-nowrap text-xs sm:text-sm text-slate-300",
+        "px-3 sm:px-4 py-2 bg-elevated border-b border-primary",
+        "overflow-x-auto whitespace-nowrap text-xs sm:text-sm text-secondary",
         "flex items-center gap-1",
         className,
       )}
@@ -34,18 +34,18 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                 type="button"
                 onClick={item.onClick}
                 className={cn(
-                  "hover:text-white transition-colors",
-                  isLast && "font-semibold text-white",
+                  "hover:text-primary transition-colors",
+                  isLast && "font-semibold text-primary",
                 )}
               >
                 {item.label}
               </button>
             ) : (
-              <span className={cn(isLast && "font-semibold text-white")}>
+              <span className={cn(isLast && "font-semibold text-primary")}>
                 {item.label}
               </span>
             )}
-            {!isLast && <span className="text-slate-500">/</span>}
+            {!isLast && <span className="text-muted">/</span>}
           </span>
         );
       })}

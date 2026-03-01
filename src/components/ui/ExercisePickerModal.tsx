@@ -229,8 +229,8 @@ export function ExercisePickerModal({
     if (loading) {
       return (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
-          <span className="text-slate-400 ml-2 text-sm">Loading library…</span>
+          <Loader2 className="w-5 h-5 text-secondary animate-spin" />
+          <span className="text-secondary ml-2 text-sm">Loading library…</span>
         </div>
       );
     }
@@ -238,11 +238,11 @@ export function ExercisePickerModal({
     if (library.length === 0) {
       return (
         <div className="text-center py-10">
-          <Dumbbell className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm mb-1">
+          <Dumbbell className="w-10 h-10 text-muted mx-auto mb-3" />
+          <p className="text-secondary text-sm mb-1">
             Your exercise library is empty.
           </p>
-          <p className="text-slate-500 text-xs">
+          <p className="text-muted text-xs">
             Create your first exercise below.
           </p>
         </div>
@@ -252,7 +252,7 @@ export function ExercisePickerModal({
     if (filtered.length === 0) {
       return (
         <div className="text-center py-8">
-          <p className="text-slate-500 text-sm">
+          <p className="text-muted text-sm">
             No exercises match &ldquo;{search}&rdquo;
           </p>
         </div>
@@ -266,7 +266,7 @@ export function ExercisePickerModal({
         <div className="space-y-4">
           {Array.from(groups.entries()).map(([group, items]) => (
             <div key={group}>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
+              <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-1.5 px-1">
                 {group}
               </p>
               <div className="space-y-1">
@@ -295,24 +295,24 @@ export function ExercisePickerModal({
         disabled={isDupe}
         className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center justify-between gap-2 ${
           isDupe
-            ? "opacity-40 cursor-not-allowed bg-slate-900/30"
-            : "hover:bg-slate-700/60 active:bg-slate-700"
+            ? "opacity-40 cursor-not-allowed bg-elevated"
+            : "hover:bg-elevated active:bg-elevated"
         }`}
       >
         <div className="min-w-0 flex-1">
-          <p className="text-white text-sm font-medium truncate">{item.name}</p>
+          <p className="text-primary text-sm font-medium truncate">{item.name}</p>
           {item.muscle_group && (
-            <p className="text-slate-500 text-xs truncate">
+            <p className="text-muted text-xs truncate">
               {item.muscle_group}
             </p>
           )}
         </div>
         <div className="text-right shrink-0">
-          <p className="text-slate-400 text-xs">
+          <p className="text-secondary text-xs">
             {item.default_reps}r × {item.default_weight}kg
           </p>
           {isDupe && (
-            <p className="text-yellow-500/80 text-xs">Already added</p>
+            <p className="text-warning text-xs">Already added</p>
           )}
         </div>
       </button>
@@ -323,13 +323,13 @@ export function ExercisePickerModal({
 
   function renderCreateForm() {
     return (
-      <div className="border-t border-slate-700 pt-4 mt-2 space-y-3">
-        <h3 className="text-white font-semibold text-sm">
+      <div className="border-t border-primary pt-4 mt-2 space-y-3">
+        <h3 className="text-primary font-semibold text-sm">
           Create New Exercise
         </h3>
 
         {createError && (
-          <p className="text-red-400 text-xs bg-red-900/20 rounded-lg px-3 py-2">
+          <p className="text-danger text-xs bg-danger-surface rounded-lg px-3 py-2">
             {createError}
           </p>
         )}
@@ -339,17 +339,17 @@ export function ExercisePickerModal({
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Exercise name *"
           autoFocus
-          className="w-full px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 rounded-lg bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-2 focus:ring-(--border-focus) focus:border-transparent"
         />
         <input
           value={newMuscle}
           onChange={(e) => setNewMuscle(e.target.value)}
           placeholder="Muscle group (optional)"
-          className="w-full px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 rounded-lg bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-2 focus:ring-(--border-focus) focus:border-transparent"
         />
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">
+            <label className="text-xs text-muted mb-1 block">
               Default Reps
             </label>
             <input
@@ -357,11 +357,11 @@ export function ExercisePickerModal({
               value={newReps || ""}
               onChange={(e) => setNewReps(parseInt(e.target.value) || 0)}
               min={1}
-              className="w-full px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-1 focus:ring-(--border-focus)"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">
+            <label className="text-xs text-muted mb-1 block">
               Default Weight (kg)
             </label>
             <input
@@ -370,7 +370,7 @@ export function ExercisePickerModal({
               onChange={(e) => setNewWeight(parseFloat(e.target.value) || 0)}
               min={0}
               step={0.5}
-              className="w-full px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-1 focus:ring-(--border-focus)"
             />
           </div>
         </div>
@@ -409,13 +409,13 @@ export function ExercisePickerModal({
       <div className="space-y-3">
         {/* Search bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
           <input
             ref={searchRef}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search exercises…"
-            className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-2 focus:ring-(--border-focus) focus:border-transparent"
           />
         </div>
 
@@ -427,7 +427,7 @@ export function ExercisePickerModal({
               onChange={(e) =>
                 handleSortChange(e.target.value as ExerciseLibrarySortMode)
               }
-              className="w-full appearance-none pl-3 pr-8 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full appearance-none pl-3 pr-8 py-2 rounded-lg bg-card border border-primary text-primary text-xs focus:outline-none focus:ring-1 focus:ring-(--border-focus)"
             >
               {SORT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -435,15 +435,15 @@ export function ExercisePickerModal({
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
           </div>
 
           <button
             onClick={() => setGrouped((g) => !g)}
             className={`px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
               grouped
-                ? "bg-blue-600/20 border-blue-500/50 text-blue-400"
-                : "bg-slate-800 border-slate-700 text-slate-400 hover:text-white"
+                ? "bg-accent-soft border-accent text-accent"
+                : "bg-card border-primary text-secondary hover:text-primary"
             }`}
             title="Group by muscle"
           >
@@ -463,7 +463,7 @@ export function ExercisePickerModal({
         ) : (
           <button
             onClick={() => setShowCreate(true)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-dashed border-slate-600 text-slate-400 hover:text-white hover:border-slate-500 transition-colors text-sm"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-dashed border-secondary text-secondary hover:text-primary hover:border-primary transition-colors text-sm"
           >
             <Plus className="w-4 h-4" />
             Create New Exercise

@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import type { Theme } from "@/lib/theme";
-import { getStoredTheme, setStoredTheme } from "@/lib/theme";
+import { getStoredTheme, setStoredTheme, applyTheme } from "@/lib/theme";
 
 interface ThemeContextType {
   currentTheme: Theme;
@@ -11,12 +11,18 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<Theme>(() =>
-    getStoredTheme()
+    getStoredTheme(),
   );
+
+  // Apply theme on mount and changes
+  useEffect(() => {
+    applyTheme(currentTheme);
+  }, [currentTheme]);
 
   const handleSetTheme = (theme: Theme) => {
     setCurrentTheme(theme);
     setStoredTheme(theme);
+    applyTheme(theme);
   };
 
   return (

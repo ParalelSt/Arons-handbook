@@ -125,15 +125,15 @@ export function HomeScreen() {
         {loading && <SkeletonList count={4} lines={3} />}
 
         {error && (
-          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 mb-4">
-            <p className="text-red-400">{error}</p>
+          <div className="bg-danger-surface border border-danger rounded-lg p-4 mb-4">
+            <p className="text-danger">{error}</p>
           </div>
         )}
 
         {!loading && !error && weeks.length === 0 && (
           <div className="text-center py-12">
-            <h2 className="text-2xl text-white mb-2">No Workouts Yet</h2>
-            <p className="text-slate-400 mb-6">Start logging your training!</p>
+            <h2 className="text-2xl text-primary mb-2">No Workouts Yet</h2>
+            <p className="text-secondary mb-6">Start logging your training!</p>
             <Button onClick={() => navigate("/workout/new")}>
               <Plus className="w-5 h-5 inline mr-2" />
               Log Your First Workout
@@ -151,18 +151,18 @@ export function HomeScreen() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">
+                    <h3 className="text-lg font-semibold text-primary mb-1">
                       Week {getWeekNumber(week.weekStart)}
                     </h3>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-secondary text-sm">
                       {formatDateRange(week.weekStart, week.weekEnd)}
                     </p>
-                    <p className="text-slate-500 text-xs mt-1">
+                    <p className="text-muted text-xs mt-1">
                       {week.workouts.length} workout
                       {week.workouts.length !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  <ChevronRight className="w-6 h-6 text-slate-500" />
+                  <ChevronRight className="w-6 h-6 text-muted" />
                 </div>
               </Card>
             ))}

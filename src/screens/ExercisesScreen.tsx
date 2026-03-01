@@ -34,9 +34,10 @@ export function ExercisesScreen() {
       setError("");
       const data = await exerciseApi.getAll();
       setExercises(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load exercises";
       console.error(err);
-      setError(err.message || "Failed to load exercises");
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -53,9 +54,10 @@ export function ExercisesScreen() {
       setNewExerciseName("");
       setShowAddModal(false);
       loadExercises();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to add exercise";
       console.error(err);
-      setError(err.message || "Failed to add exercise");
+      setError(msg);
     } finally {
       setSaving(false);
     }
@@ -69,9 +71,10 @@ export function ExercisesScreen() {
       await exerciseApi.delete(id);
       setDeleteConfirm(null);
       loadExercises();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to delete exercise";
       console.error(err);
-      setError(err.message || "Failed to delete exercise");
+      setError(msg);
       setDeleteConfirm(null);
     }
   }
@@ -92,9 +95,10 @@ export function ExercisesScreen() {
       setEditingExercise(null);
       setEditName("");
       loadExercises();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to rename exercise";
       console.error(err);
-      setError(err.message || "Failed to rename exercise");
+      setError(msg);
     } finally {
       setSaving(false);
     }
@@ -119,14 +123,14 @@ export function ExercisesScreen() {
 
         {loading && (
           <div className="text-center py-12">
-            <div className="text-slate-400">Loading exercises...</div>
+            <div className="text-secondary">Loading exercises...</div>
           </div>
         )}
 
         {!loading && exercises.length === 0 && (
           <div className="text-center py-12">
-            <h2 className="text-2xl text-white mb-2">No Exercises Yet</h2>
-            <p className="text-slate-400 mb-6">Create your exercise library</p>
+            <h2 className="text-2xl text-primary mb-2">No Exercises Yet</h2>
+            <p className="text-secondary mb-6">Create your exercise library</p>
             <Button onClick={() => setShowAddModal(true)}>
               <Plus className="w-5 h-5 inline mr-2" />
               Add Your First Exercise
@@ -139,15 +143,15 @@ export function ExercisesScreen() {
             {exercises.map((exercise) => (
               <Card key={exercise.id} className="p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">
+                  <span className="text-primary font-medium">
                     {exercise.name}
                   </span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEditClick(exercise)}
-                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                      className="p-2 hover:bg-elevated rounded-lg transition-colors"
                     >
-                      <Edit2 className="w-4 h-4 text-blue-400" />
+                      <Edit2 className="w-4 h-4 text-accent" />
                     </button>
                     <button
                       onClick={() =>
@@ -156,9 +160,9 @@ export function ExercisesScreen() {
                           name: exercise.name,
                         })
                       }
-                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                      className="p-2 hover:bg-elevated rounded-lg transition-colors"
                     >
-                      <Trash2 className="w-4 h-4 text-red-400" />
+                      <Trash2 className="w-4 h-4 text-danger" />
                     </button>
                   </div>
                 </div>

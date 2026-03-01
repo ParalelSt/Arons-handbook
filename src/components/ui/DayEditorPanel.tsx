@@ -202,7 +202,7 @@ export function DayEditorPanel({
         {showImportDay && (
           <button
             onClick={() => setShowDayImport(true)}
-            className="p-1.5 text-slate-500 hover:text-green-400 hover:bg-green-900/20 rounded-lg transition-colors"
+            className="p-1.5 text-muted hover:text-success hover:bg-success-surface rounded-lg transition-colors"
             title="Import existing day"
             aria-label="Import existing day"
           >
@@ -229,8 +229,8 @@ export function DayEditorPanel({
 
       {/* ── Empty state ──────────────────────────────── */}
       {exercises.length === 0 && (
-        <div className="text-center py-6 border border-dashed border-slate-700 rounded-lg">
-          <p className="text-slate-500 text-sm mb-3">No exercises yet</p>
+        <div className="text-center py-6 border border-dashed border-primary rounded-lg">
+          <p className="text-muted text-sm mb-3">No exercises yet</p>
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <Button
               variant="secondary"
@@ -271,7 +271,7 @@ export function DayEditorPanel({
             draggable
             onDragStart={() => handleDragStart(exIndex)}
             onDragOver={(e) => handleDragOver(e, exIndex)}
-            className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50"
+            className="bg-card rounded-lg p-3 border border-primary"
           >
             {/* Exercise header row */}
             <div className="flex items-center gap-2 mb-3">
@@ -279,7 +279,7 @@ export function DayEditorPanel({
                 className="cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
                 title="Drag to reorder"
               >
-                <GripVertical className="w-4 h-4 text-slate-600" />
+                <GripVertical className="w-4 h-4 text-muted" />
               </div>
 
               <input
@@ -287,7 +287,7 @@ export function DayEditorPanel({
                 onChange={(e) => updateName(exIndex, e.target.value)}
                 placeholder="Exercise name"
                 aria-label={`Exercise ${exIndex + 1} name`}
-                className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-2 focus:ring-(--border-focus) focus:border-transparent"
               />
 
               {/* Move up / down */}
@@ -296,7 +296,7 @@ export function DayEditorPanel({
                   onClick={() => moveExercise(exIndex, exIndex - 1)}
                   disabled={exIndex === 0}
                   aria-label="Move exercise up"
-                  className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                  className="p-1 text-muted hover:text-primary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 >
                   <ArrowUp className="w-4 h-4" />
                 </button>
@@ -304,7 +304,7 @@ export function DayEditorPanel({
                   onClick={() => moveExercise(exIndex, exIndex + 1)}
                   disabled={exIndex === exercises.length - 1}
                   aria-label="Move exercise down"
-                  className="p-1 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                  className="p-1 text-muted hover:text-primary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 >
                   <ArrowDown className="w-4 h-4" />
                 </button>
@@ -313,7 +313,7 @@ export function DayEditorPanel({
               <button
                 onClick={() => setDeleteConfirm(exIndex)}
                 aria-label={`Remove exercise ${ex.name || exIndex + 1}`}
-                className="p-1.5 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors flex-shrink-0"
+                className="p-1.5 text-danger hover:bg-danger-surface rounded-lg transition-colors shrink-0"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -322,7 +322,7 @@ export function DayEditorPanel({
             {/* Sets table */}
             {ex.sets.length > 0 && (
               <div className="mb-2">
-                <div className="grid grid-cols-[auto_auto_1fr_1fr_auto] gap-2 text-xs text-slate-500 mb-1 px-1">
+                <div className="grid grid-cols-[auto_auto_1fr_1fr_auto] gap-2 text-xs text-muted mb-1 px-1">
                   <span className="w-8" />
                   <span className="w-6 text-center">Set</span>
                   <span>Reps</span>
@@ -341,7 +341,7 @@ export function DayEditorPanel({
                         onClick={() => moveSet(exIndex, setIndex, setIndex - 1)}
                         disabled={setIndex === 0}
                         aria-label="Move set up"
-                        className="p-0.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                        className="p-0.5 text-muted hover:text-primary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       >
                         <ArrowUp className="w-4 h-4" />
                       </button>
@@ -349,13 +349,13 @@ export function DayEditorPanel({
                         onClick={() => moveSet(exIndex, setIndex, setIndex + 1)}
                         disabled={setIndex === ex.sets.length - 1}
                         aria-label="Move set down"
-                        className="p-0.5 text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                        className="p-0.5 text-muted hover:text-primary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       >
                         <ArrowDown className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <span className="text-slate-500 text-xs w-6 text-center">
+                    <span className="text-muted text-xs w-6 text-center">
                       {setIndex + 1}
                     </span>
 
@@ -372,7 +372,7 @@ export function DayEditorPanel({
                       }
                       aria-label={`Set ${setIndex + 1} reps`}
                       min={1}
-                      className="w-full px-2 py-1.5 rounded bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2 py-1.5 rounded bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-1 focus:ring-(--border-focus)"
                     />
 
                     <input
@@ -389,13 +389,13 @@ export function DayEditorPanel({
                       aria-label={`Set ${setIndex + 1} weight`}
                       min={0}
                       step={0.5}
-                      className="w-full px-2 py-1.5 rounded bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2 py-1.5 rounded bg-elevated border border-primary text-primary text-sm focus:outline-none focus:ring-1 focus:ring-(--border-focus)"
                     />
 
                     <button
                       onClick={() => removeSet(exIndex, setIndex)}
                       aria-label={`Remove set ${setIndex + 1}`}
-                      className="p-1 text-slate-500 hover:text-red-400 transition-colors"
+                      className="p-1 text-muted hover:text-danger transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -406,7 +406,7 @@ export function DayEditorPanel({
 
             <button
               onClick={() => addSet(exIndex)}
-              className="text-xs text-blue-400 hover:text-blue-300 transition-colors mt-1"
+              className="text-xs text-accent hover:text-primary transition-colors mt-1"
             >
               + Add Set
             </button>
