@@ -418,12 +418,12 @@ export async function createWorkoutFromDayTemplate(
   const { data: day, error: dayErr } = await supabase
     .from("day_templates")
     .select(
-      "id, name, exercise_templates(id, name, order_index, template_sets(reps, weight, order_index))",
+      "id, name, exercise_templates(id, name, template_sets(reps, weight))",
     )
     .eq("id", dayTemplateId)
     .single();
 
-  if (dayErr || !day) throw dayErr ?? new Error("Day template not found");
+  if (dayErr || !day) throw new Error(dayErr?.message ?? "Day template not found");
 
   // Create workout shell
   const { data: workout, error: wErr } = await supabase
@@ -432,17 +432,14 @@ export async function createWorkoutFromDayTemplate(
     .select("id")
     .single();
 
-  if (wErr || !workout) throw wErr ?? new Error("Failed to create workout");
+  if (wErr || !workout) throw new Error(wErr?.message ?? "Failed to create workout");
 
   // Insert exercises with weight carry-over (same logic as generateWeekFromTemplate)
-  const exTemplates = (
-    day.exercise_templates as {
-      id: string;
-      name: string;
-      order_index: number;
-      template_sets: { reps: number; weight: number; order_index: number }[];
-    }[]
-  ).sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
+  const exTemplates = day.exercise_templates as {
+    id: string;
+    name: string;
+    template_sets: { reps: number; weight: number }[];
+  }[];
 
   for (let i = 0; i < exTemplates.length; i++) {
     const et = exTemplates[i];
@@ -454,15 +451,11 @@ export async function createWorkoutFromDayTemplate(
       .select("id")
       .single();
 
-    if (weErr || !we) throw weErr ?? new Error("Failed to create workout exercise");
-
-    const sets = et.template_sets.sort(
-      (a, b) => (a.order_index ?? 0) - (b.order_index ?? 0),
-    );
+    if (weErr || !we) throw new Error(weErr?.message ?? "Failed to create workout exercise");
 
     const setsToInsert = [];
-    for (let j = 0; j < sets.length; j++) {
-      const s = sets[j];
+    for (let j = 0; j < et.template_sets.length; j++) {
+      const s = et.template_sets[j];
       let weight = s.weight;
       try {
         const lastWeight = await getLastUsedWeight(userId, et.name);
@@ -480,7 +473,7 @@ export async function createWorkoutFromDayTemplate(
 
     if (setsToInsert.length > 0) {
       const { error: sErr } = await supabase.from("sets").insert(setsToInsert);
-      if (sErr) throw sErr;
+      if (sErr) throw new Error(sErr.message);
     }
   }
 

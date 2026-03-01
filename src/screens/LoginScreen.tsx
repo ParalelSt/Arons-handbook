@@ -85,7 +85,7 @@ export function LoginScreen() {
                 setIsSignUp(!isSignUp);
                 setError("");
               }}
-              className="text-muted hover:text-primary transition-colors text-xs sm:text-sm"
+              className="text-accent hover:text-primary transition-colors text-xs sm:text-sm"
             >
               {isSignUp
                 ? "Already have an account? Sign in"
