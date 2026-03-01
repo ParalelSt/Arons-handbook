@@ -6,15 +6,13 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { exerciseApi } from "@/lib/api";
 import type { Exercise } from "@/types";
-import { Plus, Trash2, Edit2 } from "lucide-react";
+import { Trash2, Edit2, Dumbbell } from "lucide-react";
 
 export function ExercisesScreen() {
   const navigate = useNavigate();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newExerciseName, setNewExerciseName] = useState("");
   const [saving, setSaving] = useState(false);
 
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
@@ -40,26 +38,6 @@ export function ExercisesScreen() {
       setError(msg);
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleAddExercise(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newExerciseName.trim()) return;
-
-    try {
-      setSaving(true);
-      setError("");
-      await exerciseApi.create(newExerciseName.trim());
-      setNewExerciseName("");
-      setShowAddModal(false);
-      loadExercises();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to add exercise";
-      console.error(err);
-      setError(msg);
-    } finally {
-      setSaving(false);
     }
   }
 
@@ -108,12 +86,7 @@ export function ExercisesScreen() {
     <Container>
       <Header
         title="Exercises"
-        onBack={() => navigate("/")}
-        action={
-          <Button onClick={() => setShowAddModal(true)}>
-            <Plus className="w-5 h-5" />
-          </Button>
-        }
+        onBack={() => navigate("/templates")}
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
@@ -128,18 +101,25 @@ export function ExercisesScreen() {
         )}
 
         {!loading && exercises.length === 0 && (
-          <div className="text-center py-12">
-            <h2 className="text-2xl text-primary mb-2">No Exercises Yet</h2>
-            <p className="text-secondary mb-6">Create your exercise library</p>
-            <Button onClick={() => setShowAddModal(true)}>
-              <Plus className="w-5 h-5 inline mr-2" />
-              Add Your First Exercise
+          <div className="text-center py-16 px-4">
+            <Dumbbell className="w-12 h-12 text-muted mx-auto mb-4" />
+            <h2 className="text-xl text-primary mb-2">No Exercises Yet</h2>
+            <p className="text-secondary mb-6 max-w-sm mx-auto">
+              Exercises are automatically added here when you save them in a
+              weekly template. Head to Templates to build your plan.
+            </p>
+            <Button onClick={() => navigate("/templates")}>
+              Go to Templates
             </Button>
           </div>
         )}
 
         {!loading && exercises.length > 0 && (
           <div className="space-y-2">
+            <p className="text-xs text-muted px-1 mb-3">
+              {exercises.length} exercise{exercises.length !== 1 ? "s" : ""} —
+              synced from your weekly templates
+            </p>
             {exercises.map((exercise) => (
               <Card key={exercise.id} className="p-4">
                 <div className="flex items-center justify-between">
@@ -171,42 +151,6 @@ export function ExercisesScreen() {
           </div>
         )}
       </div>
-
-      <Modal
-        isOpen={showAddModal}
-        onClose={() => {
-          setShowAddModal(false);
-          setNewExerciseName("");
-        }}
-        title="Add Exercise"
-      >
-        <form onSubmit={handleAddExercise} className="space-y-4">
-          <Input
-            label="Exercise Name"
-            value={newExerciseName}
-            onChange={setNewExerciseName}
-            placeholder="e.g., Bench Press"
-            required
-          />
-          <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setShowAddModal(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={saving || !newExerciseName.trim()}
-              className="flex-1"
-            >
-              {saving ? "Adding..." : "Add"}
-            </Button>
-          </div>
-        </form>
-      </Modal>
 
       <Modal
         isOpen={!!editingExercise}
