@@ -1,33 +1,34 @@
-export type Theme = "deep-blue" | "athletic-red" | "slate-minimal";
+export type Theme = "midnight-blue" | "black-power-red" | "charcoal-red";
 
 export const themes: Record<Theme, { name: string; dataTheme: string }> = {
-  "deep-blue": {
-    name: "Deep Blue",
-    dataTheme: "deep-blue",
+  "midnight-blue": {
+    name: "Midnight Blue",
+    dataTheme: "midnight-blue",
   },
-  "athletic-red": {
-    name: "Athletic Red",
-    dataTheme: "athletic-red",
+  "black-power-red": {
+    name: "Black Power Red",
+    dataTheme: "black-power-red",
   },
-  "slate-minimal": {
-    name: "Slate",
-    dataTheme: "slate-minimal",
+  "charcoal-red": {
+    name: "Charcoal Red",
+    dataTheme: "charcoal-red",
   },
 };
 
 export function getStoredTheme(): Theme {
   const stored = localStorage.getItem("app-theme");
   if (
-    stored === "deep-blue" ||
-    stored === "athletic-red" ||
-    stored === "slate-minimal"
+    stored === "midnight-blue" ||
+    stored === "black-power-red" ||
+    stored === "charcoal-red"
   ) {
     return stored;
   }
   // Migrate old theme names
-  if (stored === "red") return "athletic-red";
-  if (stored === "slate") return "slate-minimal";
-  return "deep-blue";
+  if (stored === "deep-blue" || stored === "blue") return "midnight-blue";
+  if (stored === "athletic-red" || stored === "red") return "black-power-red";
+  if (stored === "slate-minimal" || stored === "slate") return "charcoal-red";
+  return "midnight-blue";
 }
 
 export function setStoredTheme(theme: Theme) {

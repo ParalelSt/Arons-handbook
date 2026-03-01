@@ -5,9 +5,9 @@ import { Palette, X } from "lucide-react";
 import { useState } from "react";
 
 const THEME_SWATCHES: Record<Theme, string> = {
-  "deep-blue": "#3B82F6",
-  "athletic-red": "#DC2626",
-  "slate-minimal": "#64748B",
+  "midnight-blue": "#3B82F6",
+  "black-power-red": "#E10600",
+  "charcoal-red": "#DC2626",
 };
 
 export function ThemeSelector() {
@@ -27,7 +27,7 @@ export function ThemeSelector() {
       </button>
 
       {showMenu && (
-        <div className="absolute right-0 top-full mt-2 bg-card border border-primary rounded-lg shadow-xl p-3 w-[180px] z-50">
+        <div className="absolute right-0 top-full mt-2 bg-floating border border-primary rounded-lg shadow-xl p-3 w-[180px] z-50">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-primary">Theme</h3>
             <button

@@ -29,7 +29,7 @@ export function ConfirmDialog({
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onCancel}
       />
-      <div className="relative bg-card rounded-2xl border border-primary max-w-sm w-full p-6 sm:p-8">
+      <div className="relative bg-floating rounded-2xl border border-primary max-w-sm w-full p-6 sm:p-8">
         <h2 className="text-lg sm:text-xl font-bold text-primary mb-2">
           {title}
         </h2>

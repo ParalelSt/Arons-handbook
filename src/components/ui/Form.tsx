@@ -101,8 +101,8 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-card rounded-2xl border border-primary max-w-lg w-[95%] sm:w-full max-h-[80vh] sm:max-h-[90vh] overflow-y-auto mx-auto my-auto">
-        <div className="sticky top-0 bg-card border-b border-primary px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-2xl">
+      <div className="relative bg-floating rounded-2xl border border-primary max-w-lg w-[95%] sm:w-full max-h-[80vh] sm:max-h-[90vh] overflow-y-auto mx-auto my-auto">
+        <div className="sticky top-0 bg-floating border-b border-primary px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-2xl">
           <h2 className="text-lg sm:text-xl font-bold text-primary">{title}</h2>
           <button
             onClick={onClose}

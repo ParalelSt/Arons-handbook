@@ -19,7 +19,7 @@
       content="black-translucent"
     />
     <meta name="apple-mobile-web-app-title" content="Gym Log" />
-    <meta name="theme-color" content="#1e293b" />
+    <meta name="theme-color" content="#0F172A" />
     <meta name="description" content="Track your gym workouts and progress" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -30,13 +30,15 @@
       // Apply theme before React loads to prevent flash of unstyled content
       (function() {
         var stored = localStorage.getItem('app-theme');
-        var theme = 'deep-blue';
-        if (stored === 'athletic-red' || stored === 'slate-minimal' || stored === 'deep-blue') {
+        var theme = 'midnight-blue';
+        if (stored === 'midnight-blue' || stored === 'black-power-red' || stored === 'charcoal-red') {
           theme = stored;
-        } else if (stored === 'red') {
-          theme = 'athletic-red';
-        } else if (stored === 'slate') {
-          theme = 'slate-minimal';
+        } else if (stored === 'deep-blue' || stored === 'blue') {
+          theme = 'midnight-blue';
+        } else if (stored === 'athletic-red' || stored === 'red') {
+          theme = 'black-power-red';
+        } else if (stored === 'slate-minimal' || stored === 'slate') {
+          theme = 'charcoal-red';
         }
         document.documentElement.setAttribute('data-theme', theme);
       })();
