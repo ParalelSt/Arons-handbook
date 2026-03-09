@@ -1,12 +1,31 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
+
+/** Emits ads.txt into the build output from the VITE_ADSENSE_CLIENT_ID env var */
+function adsTxtPlugin(): Plugin {
+  return {
+    name: "generate-ads-txt",
+    apply: "build",
+    generateBundle() {
+      const clientId = process.env.VITE_ADSENSE_CLIENT_ID;
+      if (clientId && clientId !== "ca-pub-XXXXXXXXXXXXXXXX") {
+        this.emitFile({
+          type: "asset",
+          fileName: "ads.txt",
+          source: `google.com, ${clientId}, DIRECT, f08c47fec0942fa0\n`,
+        });
+      }
+    },
+  };
+}
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    adsTxtPlugin(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["vite.svg", "icon-192.png", "icon-512.png"],
