@@ -1,0 +1,38 @@
+---
+description: Core engineering principles — verification, protected files, security, comments
+alwaysApply: true
+---
+
+# Core Principles
+
+- **Follow existing patterns.** Find a similar example in the codebase and match its structure.
+- **Minimal impact.** Touch only what is necessary.
+- **Type safety.** No `any` types. Use Zod schemas with `z.infer`, narrow with runtime checks.
+- **Don't over-document.** Don't add JSDoc/comments to code you didn't write or change.
+
+## Verification
+
+After making edits, **always** run typecheck and lint:
+
+```bash
+npm run build
+npm run lint
+```
+
+Both must pass before work is considered complete.
+
+## Do NOT Touch
+
+- `*.generated.*` files — auto-generated
+- Lock files (`package-lock.json`, `bun.lock`, `yarn.lock`, `pnpm-lock.yaml`) — only via package manager
+- Vendored / third-party library directories
+
+## Security
+
+- Never commit `.env.local`, `.env`, private keys, or API secrets
+- Never log sensitive credentials or authentication tokens
+
+## Comments
+
+- When refactoring or moving code, preserve existing comments — don't silently drop them
+- If code is restructured such that a comment no longer applies in its original form, adapt the comment to the new context rather than removing it

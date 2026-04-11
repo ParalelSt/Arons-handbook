@@ -148,7 +148,20 @@ export async function getWeekComparison(
   const sorted = [...volumes].sort((a, b) =>
     a.weekStart.localeCompare(b.weekStart),
   );
-  const recent = sorted.slice(-2);
+
+  // Skip the current in-progress week — compare the last two completed weeks
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const completedWeeks = sorted.filter((w) => {
+    // A week is "complete" if its start + 6 days is before today
+    const weekEnd = new Date(w.weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    return weekEnd.toISOString().slice(0, 10) < todayStr;
+  });
+
+  if (completedWeeks.length < 2) return null;
+
+  const recent = completedWeeks.slice(-2);
   const previous = recent[0];
   const current = recent[1];
 

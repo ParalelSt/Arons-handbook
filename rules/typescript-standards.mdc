@@ -1,0 +1,96 @@
+---
+description: TypeScript coding standards — type safety, naming, conditionals, JSDoc
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript Standards
+
+## Type Safety
+
+- No `any` types — use `unknown` and narrow with runtime checks
+- Use Zod schemas with `z.infer<typeof schema>` for runtime validation
+- Prefer discriminated unions over type assertions
+- Never use `as` type assertions to work around type errors. Fix the types, adjust the data structure, or use proper generics. Type safety must be earned, not bypassed.
+
+```tsx
+// Good - fix the actual type
+const options: SelectOption<Status>[] = [...]
+
+// Bad - hack around it
+const options = [...] as const as any
+```
+
+## Naming Conventions
+
+- **Variables and functions**: `camelCase`
+- **Constants**: `UPPER_SNAKE_CASE`
+- **Booleans**: Prefix with `is`, `has`, or `should` — e.g. `isLoading`, `hasDataLoaded`, `shouldShowModal`
+- **Files**: `camelCase.ts`, `PascalCase.tsx` for components
+- **Directories**: `camelCase` or `kebab-case`
+- **Types/Interfaces**: `PascalCase`
+- **Components**: `PascalCase` — descriptive names that clearly convey purpose
+
+## Type Style Preferences
+
+- **Typed consts over enums**: Use `as const` objects instead of `enum`. Enums have runtime baggage and quirks.
+- **Interfaces over types**: Prefer `interface` for object shapes. Use `type` only for unions, intersections, or mapped types.
+- **Naming convention**: Exported interfaces/types use verbose descriptive names (e.g., `GridCellProps`, `UserProfile`). Non-exported (file-local) ones use simple names (e.g., `Props`, `State`).
+
+```tsx
+// Good - exported, verbose name
+export interface GridCellProps { ... }
+
+// Good - non-exported, simple name
+interface Props { ... }
+
+// Good - typed const over enum
+const STATUS = { ACTIVE: "active", INACTIVE: "inactive" } as const;
+
+// Bad - enum
+enum Status { Active = "active", Inactive = "inactive" }
+```
+
+## `T | undefined` vs `?:`
+
+Use `T | undefined` when the prop **must always be passed** but its value may be undefined (e.g., data that hasn't loaded yet). Use `?:` when the prop is a **truly optional override**.
+
+```typescript
+interface Props {
+  price: BigNumber | undefined;  // Must pass — may be undefined while loading
+  formatSpecifier?: string;      // Optional override — can omit entirely
+}
+```
+
+## Conditional Logic
+
+- Limit ternary expressions to **one level** — never nest ternaries
+- Use IIFE with early returns for complex conditional assignments
+
+```typescript
+// Good — single ternary
+const status = isActive ? 'active' : 'inactive';
+
+// Good — IIFE for multiple conditions
+const result = (() => {
+  if (isDisabled) return 'disabled';
+  if (isLoading) return 'loading';
+  return 'enabled';
+})();
+
+// Bad — nested ternary
+const result = isActive ? (isLoading ? 'loading' : 'active') : 'inactive';
+```
+
+## JSDoc
+
+Use JSDoc (`/** ... */`) for **all exported** functions, variables, constants, types, and interfaces. Don't use JSDoc for internal/private helpers or inline implementation comments.
+
+```typescript
+/**
+ * Brief description of what it does.
+ * @param paramName - Description of parameter
+ * @returns Description of return value
+ */
+export function myFunction(paramName: string): Result { ... }
+```

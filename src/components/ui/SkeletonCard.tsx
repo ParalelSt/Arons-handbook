@@ -1,46 +1,11 @@
-interface SkeletonCardProps {
-  lines?: number;
-  height?: number;
-  className?: string;
-}
+import { cn } from "@/lib/utils";
 
-export function SkeletonCard({
-  lines = 3,
-  height = 14,
-  className = "",
-}: SkeletonCardProps) {
+export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div
-      className={`bg-card rounded-xl border border-primary p-5 space-y-3 ${className}`}
-      role="status"
-      aria-label="Loading…"
-    >
-      {Array.from({ length: lines }).map((_, i) => (
-        <div
-          key={i}
-          className="animate-pulse rounded bg-elevated"
-          style={{
-            height,
-            width: i === lines - 1 ? "60%" : "100%",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-export function SkeletonList({
-  count = 3,
-  lines = 3,
-}: {
-  count?: number;
-  lines?: number;
-}) {
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: count }).map((_, i) => (
-        <SkeletonCard key={i} lines={lines} />
-      ))}
+    <div className={cn("bg-card rounded-xl border border-primary p-4 animate-pulse", className)}>
+      <div className="h-4 bg-elevated rounded w-2/3 mb-3" />
+      <div className="h-3 bg-elevated rounded w-1/2 mb-2" />
+      <div className="h-3 bg-elevated rounded w-1/3" />
     </div>
   );
 }

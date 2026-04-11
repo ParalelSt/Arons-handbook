@@ -414,6 +414,19 @@ export async function createWorkoutFromDayTemplate(
 ): Promise<string> {
   const userId = await getAuthUserId();
 
+  // Override: delete existing workout on this date if any
+  const { data: existing } = await supabase
+    .from("workouts")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("date", date);
+
+  if (existing && existing.length > 0) {
+    for (const w of existing) {
+      await supabase.from("workouts").delete().eq("id", w.id);
+    }
+  }
+
   // Get day with exercises + sets
   const { data: day, error: dayErr } = await supabase
     .from("day_templates")

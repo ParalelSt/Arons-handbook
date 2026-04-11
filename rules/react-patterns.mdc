@@ -1,0 +1,97 @@
+---
+description: React component patterns — declarations, props, hooks, compound components
+globs: "**/*.tsx"
+alwaysApply: false
+---
+
+# React Patterns
+
+## Component Declarations
+
+- Never use `React.FC` — use plain function declarations
+- Use `const` arrow functions for declarations **inside** components and hooks — not `function`
+
+```tsx
+// Good
+function MyComponent({ label }: Props) { ... }
+
+// Inside hooks/components
+useEffect(() => {
+  const handleClick = () => { ... };
+}, []);
+
+// Bad
+const MyComponent: React.FC<Props> = ({ label }) => { ... };
+```
+
+## Props
+
+- Extract props to `interface Props` when component has **3+ props**; inline the type for fewer
+- Extend helper types in interfaces — `interface Props extends WithClassnames`, not `WithClassnames<Props>`
+- Use compound component pattern (namespace) for complex components (e.g., `Select.Root`, `Input.Container`)
+
+```tsx
+// 1-2 props: inline
+function Badge({ label }: { label: string }) { ... }
+
+// 3+ props: extract
+interface Props {
+  price: number | undefined;
+  side: 'buy' | 'sell';
+  size?: 'sm' | 'md';
+}
+function PriceDisplay({ price, side, size }: Props) { ... }
+```
+
+## No forwardRef
+
+React 19 passes `ref` as a regular prop. Never use `React.forwardRef`.
+
+## No Logic in JSX
+
+Never put logic (state, conditionals, computations) inside JSX. Extract all logic into dedicated hooks (e.g., `useFeaturePage`) under `src/hooks/`. Pages should only compose components with data from hooks.
+
+## No Rendering Conditionals in JSX
+
+Never use inline ternaries or `&&` for conditional rendering inside JSX. Always extract to a named `const` before the return statement:
+
+```tsx
+// Good
+const content = isReady ? <Ready /> : <Loading />;
+return <div>{content}</div>;
+
+// Bad
+return <div>{isReady ? <Ready /> : <Loading />}</div>;
+```
+
+## No Inline SVG in JSX
+
+Never embed raw SVG markup directly in page/component JSX. Extract SVGs into dedicated icon components under `src/components/icons/`.
+
+## Hook Naming
+
+| Hook type | Prefix | Example |
+|-----------|--------|---------|
+| Query (wraps `useQuery`) | `useQuery` | `useQueryUserProfile` |
+| Execute (wraps `useMutation`) | `useExecute` | `useExecuteSubmitOrder` |
+| Derived (composes other hooks) | descriptive | `useFeatureChart`, `useAccountSummary` |
+
+Loading variable names should match the data variable with `is<X>Loading`:
+
+```typescript
+const {
+  data: userProfile,
+  isLoading: isUserProfileLoading,
+} = useQueryUserProfile();
+```
+
+## Query & Mutation Rules
+
+- Always wrap `useQuery`/`useMutation` in custom hooks — never call directly in components
+- Use standardized query key factories for consistent cache management
+- Handle disabled queries with a dedicated error type (e.g., `QueryDisabledError`)
+
+## UI Terminology
+
+- **`title`** — Categorizes the contents of a component (e.g., card heading). No direct correlation to specific data.
+- **`label`** — Accompanies a specific data element or input. Direct correlation with the data displayed.

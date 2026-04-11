@@ -1,52 +1,40 @@
-import { Button } from "./Layout";
+"use client";
+
+import { Modal } from "./Modal";
+import { Button } from "./Button";
 
 interface ConfirmDialogProps {
-  isOpen: boolean;
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
   title: string;
   message: string;
   confirmLabel?: string;
-  cancelLabel?: string;
-  isDestructive?: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
+  variant?: "primary" | "danger";
+  loading?: boolean;
 }
 
 export function ConfirmDialog({
-  isOpen,
+  open,
+  onClose,
+  onConfirm,
   title,
   message,
-  confirmLabel = "Delete",
-  cancelLabel = "Cancel",
-  isDestructive = true,
-  onConfirm,
-  onCancel,
+  confirmLabel = "Confirm",
+  variant = "danger",
+  loading,
 }: ConfirmDialogProps) {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onCancel}
-      />
-      <div className="relative bg-floating rounded-2xl border border-primary max-w-sm w-full p-6 sm:p-8">
-        <h2 className="text-lg sm:text-xl font-bold text-primary mb-2">
-          {title}
-        </h2>
-        <p className="text-sm sm:text-base text-secondary mb-6">{message}</p>
-        <div className="flex gap-3">
-          <Button onClick={onCancel} variant="secondary" className="flex-1">
-            {cancelLabel}
-          </Button>
-          <Button
-            onClick={onConfirm}
-            variant={isDestructive ? "danger" : "primary"}
-            className="flex-1"
-          >
-            {confirmLabel}
-          </Button>
-        </div>
+    <Modal open={open} onClose={onClose} title={title} size="sm">
+      <p className="text-secondary text-sm mb-6">{message}</p>
+      <div className="flex gap-3 justify-end">
+        <Button variant="ghost" onClick={onClose} disabled={loading}>
+          Cancel
+        </Button>
+        <Button variant={variant} onClick={onConfirm} loading={loading}>
+          {confirmLabel}
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 }

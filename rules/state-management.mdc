@@ -1,0 +1,38 @@
+---
+description: State management hierarchy — when to use global state, server state, context, local state
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# State Management
+
+## Hierarchy
+
+Use the right tool for each kind of state. Never mix patterns.
+
+| State Kind | Tool | Examples |
+|------------|------|----------|
+| Global client state | Atom library (Jotai / Zustand) | UI preferences, navigation, theme |
+| Server / API data | TanStack Query | REST responses, blockchain data, DB records |
+| Scoped services | React Context | Form instances, API clients, feature contexts |
+| Local UI state | `useState` | Truly local, single-component toggles |
+
+**Key rule:** Never put server data in global atoms — that's TanStack Query's job.
+
+## Store Conventions
+
+- Store files export a single `use[Name]Store` hook
+- Use persist middleware for state that should survive page reloads (localStorage)
+- Keep stores focused — one domain per store
+
+## Query Hooks
+
+- Always wrap `useQuery` in a custom `useQuery<Name>` hook
+- Always wrap `useMutation` in a custom `useExecute<Name>` hook
+- Use a query key factory (e.g., `createQueryKey()`) for standardized, collision-free cache keys
+- Name loading vars to match: `data: orders` → `isLoading: isOrdersLoading`
+
+## Mutations
+
+- Use a context-aware wrapper for mutations that need wallet/auth context
+- Use a consistent error logger for mutation failures
