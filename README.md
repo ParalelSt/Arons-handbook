@@ -1,256 +1,207 @@
 # Gym LogBook
 
-A React + TypeScript + Supabase application for tracking gym exercises and workout progress. Use it on your phone while at the gym!
+A Next.js + TypeScript + Supabase app for tracking gym workouts, templates, goals, and progress. Built mobile-first — use it on your phone at the gym.
 
 ## Features
 
-- 🏋️ Track exercises with sets, reps, and weight
-- 📅 View workouts organized by week
-- 🎯 Set and track exercise goals
-- 📋 Create reusable workout templates
-- 🔄 Copy last week's weights for easy progressive overload
-- ⚖️ **Weight carry-over** — templates auto-fill last used weights
-- 📊 **Exercise progress comparison** — see previous performance inline
-- 📈 **Analytics dashboard** — strength graphs, volume trends, weekly comparison
-- 🏆 **Personal records (PR)** — automatic detection and tracking
-- 💰 **Optional AdSense** — open source friendly, env-controlled monetization
-- ☁️ Cloud data storage with Supabase
-- 🔐 Secure user authentication
-- 🎨 Multiple color themes (Blue, Red, Slate)
-- 📱 Mobile-friendly responsive design
-- 💾 PWA support — install on your phone!
-- 🛡️ Row Level Security on all tables
-- ⚡ Optimised Supabase queries with proper indexing
+- Track exercises with sets, reps, and weight
+- Month calendar view of workouts with per-day indicators
+- Weekly workout templates with per-day overrides
+- Exercise and day libraries for quick reuse
+- Exercise goals with line charts and target reference
+- Analytics dashboard — strength graphs, volume trends, weekly comparison
+- Personal records (PR) — automatic detection and timeline
+- Weight carry-over — templates auto-fill last used weights
+- Email/password and Google sign-in via Supabase Auth
+- 5 color themes (Midnight, Crimson, Forest, Ember, Slate)
+- Responsive layout — bottom tabs on mobile, sidebar on desktop
+- PWA support — installable on phone, offline caching
+- Row Level Security on all tables
 
 ## Tech Stack
 
-- **React 19** — UI library
-- **TypeScript** — Type safety
-- **Vite** — Build tool & dev server
-- **Tailwind CSS** — Styling
-- **Supabase** — Backend & database (PostgreSQL)
-- **Recharts** — Analytics charts
-- **Vercel** — Hosting platform
-- **date-fns** — Date utilities
+- **Next.js 16** (App Router, Turbopack) — framework + build
+- **React 19** — UI
+- **TypeScript** — type safety
+- **Tailwind CSS 4** — styling
+- **Supabase** — Postgres + Auth
+- **Recharts** — analytics charts
+- **date-fns** — date utilities
+- **@ducanh2912/next-pwa** — PWA / service worker
+- **Vercel** — hosting
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Install
 
 ```bash
 npm install
 ```
 
-### 2. Set Up Supabase
+### 2. Set up Supabase
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for full setup instructions.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full instructions. Short version:
 
-Quick version:
-
-1. Create account at [supabase.com](https://supabase.com)
-2. Create new project
-3. Run `supabase/schema.sql` in SQL Editor
-4. Run `supabase/templates_migration.sql`
-5. Run `supabase/migrations/20251206_add_exercise_goals.sql`
-6. Run `supabase/migrations/20260214_analytics_prs_security.sql`
-7. Copy your project URL and anon key
+1. Create a project at [supabase.com](https://supabase.com)
+2. In the SQL Editor run, in order:
+   - `supabase/schema.sql`
+   - `supabase/templates_migration.sql`
+   - `supabase/migrations/20251206_add_exercise_goals.sql`
+   - `supabase/migrations/20260214_analytics_prs_security.sql`
+   - `supabase/migrations/20260215_exercise_day_library.sql`
+   - `supabase/migrations/20260215_weekly_templates_analytics_rpc.sql`
+3. (Optional) Enable Google provider under **Authentication → Providers**
+4. Copy the project URL and anon key
 
 ### 3. Configure Environment
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Edit `.env` and add your Supabase credentials:
+Edit `.env.local`:
 
 ```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Optional monetization variables (only for hosted production):
-
-```env
-VITE_ENABLE_ADS=true
-VITE_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXX
-VITE_ADSENSE_SLOT_ID=XXXXXXXXXX
-```
-
-### 4. Run Development Server
+### 4. Dev Server
 
 ```bash
 npm run dev
 ```
 
-Visit http://localhost:5173
+Visit http://localhost:3000
 
-## Deployment
+### 5. Production Build
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide to Vercel.
+```bash
+npm run build
+npm start
+```
 
-**TLDR:**
+## Deployment (Vercel)
 
 1. Push to GitHub
-2. Import to Vercel
-3. Add environment variables
-4. Deploy!
+2. Import the repo into Vercel — framework auto-detects as Next.js
+3. Add env vars in **Project → Settings → Environment Variables**:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Deploy
 
-Your app will be accessible on your phone at your Vercel URL.
+If you use Supabase email confirmation, add your production URL to **Supabase → Authentication → URL Configuration → Redirect URLs** (e.g. `https://your-app.vercel.app/login`).
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full walkthrough.
 
 ## Architecture
 
+### Routing
+
+- `src/app/login/page.tsx` — auth page (outside the dashboard shell)
+- `src/app/(dashboard)/layout.tsx` — auth guard + responsive nav shell
+- `src/app/(dashboard)/page.tsx` — home (month calendar)
+- `src/app/(dashboard)/week/[weekStart]/page.tsx` — week detail
+- `src/app/(dashboard)/workout/[id]/page.tsx` — workout detail + edit
+- `src/app/(dashboard)/templates/` — template list + editor
+- `src/app/(dashboard)/goals/`, `analytics/`, `exercises/`, `settings/`, `support/`
+
+### Auth
+
+Supabase uses localStorage sessions, so auth is guarded in a client layout rather than Next middleware. `AuthProvider` exposes the current user; `(dashboard)/layout.tsx` redirects to `/login` when signed out.
+
 ### Template System
 
-- Create reusable workout templates with exercises, sets, reps, and default weights
-- **Weight carry-over**: When creating a workout from a template, the system finds the last weight used for each exercise and pre-fills it. Falls back to template defaults if no history exists
-- Users can always edit pre-filled values
+- Weekly templates hold 7 day slots; each slot can assign a day template
+- Assigning a day template to a date with an existing workout replaces it (progression is date-based, so it stays consistent)
+- Weight carry-over: new workouts pre-fill with the last weight used for each exercise, falling back to the template default
 
 ### Progress Tracking
 
-- Each exercise card shows the most recent previous occurrence (excluding current workout)
-- Matches by exercise name (case-insensitive)
-- Shows weight, reps, and week/day reference
-- Trend indicators: ↑ improved, ↓ lower, → same
+- Each exercise shows the most recent previous occurrence
+- Query filters by `date < currentWorkoutDate` AND at least one set with `weight > 0` — no comparison against empty or future workouts
+- Implemented in `src/lib/progression.ts`
 
-### Analytics System
+### Analytics
 
-- **Strength Progress**: Line chart of max weight over time per exercise
-- **Volume Trends**: Bar chart of weekly total volume (weight × reps)
-- **Weekly Comparison**: Side-by-side comparison of last two weeks
-- **PR Timeline**: Chronological list of personal records
-- All data computed in `src/lib/analytics.ts` service layer — never in components
+- Strength progress — max weight per exercise over time
+- Volume trends — weekly `weight × reps` totals
+- Weekly comparison — last two **completed** weeks (skips the in-progress week)
+- PR timeline — chronological personal records
+- All logic lives in `src/lib/analyticsService.ts`, never in components
 
-### PR System
+### Themes
 
-- Automatic detection when a set's weight exceeds the previous max
-- Records stored in `personal_records` table
-- Small "PR" badge displayed in the workout view
-- PR timeline available on the Analytics page
+5 themes via CSS custom properties on `<html data-theme>`:
 
-### Monetization Model
+| Key | Accent | Surface |
+|---|---|---|
+| `midnight` | Blue | Slate |
+| `crimson` | Red | Black |
+| `forest` | Green | Dark green |
+| `ember` | Amber | Dark brown |
+| `slate` | Gray | Charcoal |
 
-- App remains fully open source
-- Ads only enabled when `VITE_ENABLE_ADS=true` **AND** running in production mode
-- Self-hosted users simply omit the env variable to disable ads
-- AdSense publisher/slot IDs configured via environment variables — never hardcoded
-- Safe ad placement: bottom of week pages, between sections — never inside forms or blocking UX
+### PWA
 
-## Database Structure
+`@ducanh2912/next-pwa` generates the service worker into `public/` at build time. Icons and manifest live in `public/`.
+
+## Database
 
 ```
 exercises
-  ├── id (uuid)
-  ├── user_id (references auth.users)
-  ├── name (text)
-  └── created_at (timestamp)
+  id, user_id, name, muscle_group, default_reps, default_weight, created_at
 
 workouts
-  ├── id (uuid)
-  ├── user_id (references auth.users)
-  ├── date (date)
-  ├── title (text, optional)
-  ├── notes (text, optional)
-  └── created_at (timestamp)
+  id, user_id, date, title, notes, created_at
 
 workout_exercises
-  ├── id (uuid)
-  ├── workout_id (references workouts)
-  ├── exercise_id (references exercises)
-  ├── notes (text, optional)
-  └── order_index (integer)
+  id, workout_id, exercise_id, order_index, notes
 
 sets
-  ├── id (uuid)
-  ├── workout_exercise_id (references workout_exercises)
-  ├── reps (integer)
-  ├── weight (numeric)
-  └── order_index (integer)
+  id, workout_exercise_id, reps, weight, order_index
+
+workout_templates          — weekly templates
+template_day_assignments   — day-of-week → day template
+day_templates              — reusable day blocks
+day_template_exercises     — exercises inside a day template
 
 exercise_goals
-  ├── id (uuid)
-  ├── user_id (references auth.users)
-  ├── exercise_id (references exercises)
-  ├── target_reps (integer, optional)
-  ├── target_weight (numeric, optional)
-  └── created_at (timestamp)
-
-workout_templates
-  ├── id (uuid)
-  ├── user_id (references auth.users)
-  ├── name (text)
-  ├── description (text, optional)
-  └── created_at (timestamp)
-
-template_exercises
-  ├── id (uuid)
-  ├── template_id (references workout_templates)
-  ├── exercise_id (references exercises)
-  ├── target_sets (integer)
-  ├── target_reps (integer, optional)
-  ├── target_weight (numeric, optional)
-  └── order_index (integer)
+  id, user_id, exercise_id, target_reps, target_weight, created_at
 
 personal_records
-  ├── id (uuid)
-  ├── user_id (references auth.users)
-  ├── exercise_name (text)
-  ├── weight (numeric)
-  ├── reps (integer)
-  ├── date (date)
-  └── created_at (timestamp)
+  id, user_id, exercise_name, weight, reps, date, created_at
 ```
 
-## Supabase Security & Performance
+Consult the migration files in `supabase/migrations/` for the authoritative schema.
 
-### Row Level Security (RLS)
+## Security & Performance
 
-All public tables have RLS enabled. Users can only access their own data:
+### Row Level Security
 
-- `exercises` — filter by `user_id`
-- `workouts` — filter by `user_id`
-- `workout_exercises` — filter via parent workout's `user_id`
-- `sets` — filter via grandparent workout's `user_id`
-- `workout_templates` — filter by `user_id`
-- `template_exercises` — filter via parent template's `user_id`
-- `exercise_goals` — filter by `user_id`
-- `personal_records` — filter by `user_id`
+RLS is enabled on every table. Users only see their own rows:
+- Direct `user_id` filter on `exercises`, `workouts`, templates, `exercise_goals`, `personal_records`
+- Transitive filter (via parent) on `workout_exercises`, `sets`, `template_exercises`
 
 ### Indexing
 
-Indexes are applied on frequently queried columns:
-
 - `user_id` on all user-owned tables
-- `date` on workouts
-- `workout_id` on workout_exercises
-- `exercise_id` on workout_exercises and exercise_goals
-- `created_at` on sets, workout_exercises
-- `exercise_name` and `date` on personal_records
+- `date` on `workouts`
+- `workout_id` on `workout_exercises`
+- `exercise_id` on `workout_exercises` and `exercise_goals`
+- `exercise_name`, `date` on `personal_records`
 
 ### Function Security
 
-All PL/pgSQL functions use `SECURITY DEFINER` with explicit `SET search_path = public` to prevent mutable search_path warnings.
+All PL/pgSQL functions use `SECURITY DEFINER` with an explicit `SET search_path = public`.
 
-## Security & Payment Handling Policy
+## Payments
 
-- The app **never** handles credit card information directly
-- No payment credentials, bank info, or API secret keys stored in frontend
-- All environment variables for sensitive keys — never hardcoded
-- Authentication uses official Supabase SDK with session management
-- If Stripe is ever used in the future: use Stripe Checkout / Payment Links only — never collect card details manually
-- All payments must be handled server-side — never build custom payment processing
-
-## Roadmap
-
-Future improvements:
-
-- 📤 Export workout history
-- 🔔 Workout reminders
-- 🏅 Achievement badges
-- 📱 Native app versions
+The app does not and will not handle payment data directly. If a payment flow is ever added, it will use hosted checkout (Stripe Checkout / Payment Links) — no card data in the frontend, no custom processing.
 
 ## Contributing
 
-Feel free to fork and customize for your own use! This project is open source and contributions are welcome.
+Fork it, customize it, PRs welcome.
 
 ## License
 
